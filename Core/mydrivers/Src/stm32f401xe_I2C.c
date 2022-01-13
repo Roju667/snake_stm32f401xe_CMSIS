@@ -17,7 +17,7 @@ void I2C_ClockEnable(I2C_TypeDef *pI2Cx)
 	{
 		RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
 	}
-	else if ()
+	else if (pI2Cx == I2C3)
 	{
 		RCC->APB1ENR |= RCC_APB1ENR_I2C3EN;
 	}
@@ -25,6 +25,7 @@ void I2C_ClockEnable(I2C_TypeDef *pI2Cx)
 
 void I2C_Init(I2C_Handle_t *hI2C)
 {
+	I2C_ClockEnable(hI2C->PinConfig);
 	
 	hI2C->pI2Cx->CR1 |= I2C_CR1_PE;
 }

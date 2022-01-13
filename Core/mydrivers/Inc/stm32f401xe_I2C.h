@@ -35,6 +35,8 @@ typedef struct
 
 } I2C_Handle_t;
 
-#define I2C_MODE_SLAVE
+#define I2C_SPEED_SLOW		0
+#define I2C_SPEED_FAST		1
+
 
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */
