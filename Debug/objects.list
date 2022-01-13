@@ -1,4 +1,3 @@
-"./Core/Src/GFX_BW.o"
 "./Core/Src/main.o"
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
@@ -6,3 +5,4 @@
 "./Core/Startup/startup_stm32f401retx.o"
 "./Core/mydrivers/Src/stm32f401xe_GPIO.o"
 "./Core/mydrivers/Src/stm32f401xe_I2C.o"
+"./Core/mydrivers/Src/stm32f401xe_RCC.o"

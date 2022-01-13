@@ -23,9 +23,9 @@ void I2C_ClockEnable(I2C_TypeDef *pI2Cx)
 	}
 }
 
-void I2C_Init(I2C_Handle_t *hI2C)
+void I2C_Init(I2C_Handle_t *phI2C)
 {
-	I2C_ClockEnable(hI2C->PinConfig);
+	I2C_ClockEnable(phI2C->pI2Cx);
 	
-	hI2C->pI2Cx->CR1 |= I2C_CR1_PE;
+	phI2C->pI2Cx->CR1 |= I2C_CR1_PE;
 }

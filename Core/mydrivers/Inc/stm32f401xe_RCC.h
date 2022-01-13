@@ -21,28 +21,31 @@
 //
 typedef struct
 {
-  uint32_t PLLState;   /*!< The new state of the PLL.
-                            This parameter can be a value of @ref RCC_PLL_Config                      */
+	int8_t PLLState; /*! @PLLState The new state of the PLL*/
 
-  uint8_t PLLSource;   /*!  @PLLSource - HSI or HSE  */
+	uint8_t PLLSource; /*! @PLLSource - HSI or HSE  */
 
-  uint8_t PLLM;       /*!< PLLM: Division factor for PLL VCO input clock. Range 0 - 63  */
+	uint8_t PLLM; /*!< PLLM: Division factor for PLL VCO input clock. Range 2 - 63  */
+	//The software has to set these bits correctly to ensure that the VCO input frequency
+	//ranges from 1 to 2 MHz.
+	//!!!It is recommended to select a frequency of 2 MHz to limit PLL jitter!!!
 
-  uint16_t PLLN;       /*!< PLLN: Multiplication factor for PLL VCO output clock.
-                            This parameter must be a number between Min_Data = 50 and Max_Data = 432
-                            except for STM32F411xE devices where the Min_Data = 192 */
+	uint16_t PLLN; /*!< PLLN: Multiplication factor for PLL VCO output clock.
+	 This parameter must be a number between Min_Data = 50 and Max_Data = 432
+	 except for STM32F411xE devices where the Min_Data = 192 */
 
-  uint8_t PLLP;       /*!< @PLLP PLLP: Division factor for main system clock (SYSCLK).*/
+	uint8_t PLLP; /*!< @PLLP PLLP: Division factor for main system clock (SYSCLK).*/
 
-  uint8_t PLLQ;       /*!< PLLQ: Division factor for OTG FS, SDIO and RNG clocks.
-                            This parameter must be a number between Min_Data = 2 and Max_Data = 15    */
+	uint8_t PLLQ; /*!< PLLQ: Division factor for OTG FS, SDIO and RNG clocks.
+	 This parameter must be a number between Min_Data = 2 and Max_Data = 15    */
 
 }RCC_PLLInitTypeDef;
 
 typedef struct
 {
-  uint32_t OscillatorType;       /*!< The oscillators to be configured.
-                                      This parameter can be a value of @ref RCC_Oscillator_Type                   */
+
+
+	uint32_t OscillatorType; /*!< The oscillators to be configured.   */
 
   uint32_t HSEState;             /*!< The new state of the HSE.
                                       This parameter can be a value of @ref RCC_HSE_Config                        */
@@ -68,6 +71,15 @@ typedef struct
  */
 #define RCC_PLL_SOURCE_HSI		0U
 #define RCC_PLL_SOURCE_HSE		1U
+
+/*
+ Main PLL (PLL) enable
+ Set and cleared by software to enable PLL.
+ @PLLState
+ */
+#define RCC_PLL_STATE_DISABLE	0U
+#define RCC_PLL_STATE_ENABLE	1U
+
 
 /*
  PLLP: Main PLL (PLL) division factor for main system clock
@@ -120,5 +132,8 @@ Set and cleared by software to control APB high-speed clock division factor
 #define RCC_ABP2_PRESCALER_DIV4		1U
 #define RCC_ABP2_PRESCALER_DIV8		2U
 #define RCC_ABP2_PRESCALER_DIV16	3U
+
+// error messages
+#define PLL_CONFIG_ERROR		1
 
 #endif /* MYDRIVERS_INC_STM32F401XE_RCC_H_ */
