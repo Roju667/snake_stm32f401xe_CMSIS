@@ -13,9 +13,9 @@
 // Struct to configure pin @PinConfig
 typedef struct
 {
-	uint8_t PinNumber;			// @PinNumber
+	uint8_t Frequency;			// @Frequency
 
-	uint8_t Mode;				// @GPIOModes
+	uint8_t Speed;				// @Speed
 
 	uint8_t OutputType;			// @OutputType
 
@@ -29,14 +29,28 @@ typedef struct
 
 typedef struct
 {
-	I2C_TypeDef *pI2Cx;	// @GPIOaddress
+	I2C_TypeDef *pI2Cx;		// @GPIOaddress
 
-	I2C_Config_t PinConfig;	// @PinConfig
+	I2C_Config_t I2CConfig;	// @Peripheral config
 
 } I2C_Handle_t;
 
-#define I2C_SPEED_SLOW		0
-#define I2C_SPEED_FAST		1
+#define I2C_SPEED_SLOW		0U
+#define I2C_SPEED_FAST		1U
 
+/*
+ * @Frequency  The minimum allowed frequency is 2 MHz,
+ * the maximum frequency is limited by the maximum APB1 frequency and cannot exceed
+ * 50 MHz (peripheral intrinsic maximum limit). Assign here ABP1 frequency.
+ */
+
+#define I2C_FREQUENCY_MINIMUM	2U
+#define I2C_FREQUENCY_MAXIMUM	50U
+
+
+/*
+ * Error
+ */
+#define I2C_ERROR_WRONG_FREQUENCY 1U
 
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */

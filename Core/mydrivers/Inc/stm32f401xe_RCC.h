@@ -9,61 +9,74 @@
 #define MYDRIVERS_INC_STM32F401XE_RCC_H_
 
 #include "stm32f401xe.h"
+/*
+ * If we are using PLL as main clock source of system clock then we need to calculate it with equation :
+ * SYSCLK = PLLSource / M  * N	/ P (this value is then going on AHB and ABP prescalers
+ * Clock for OTG FS, SDIO and RNG = PLLSource /M *N /Q (straight to those peripherals)
+ *
+ * @PLLState The new state of the PLL
+ *
+ * @PLLSource - HSI or HSE
+ *
+ * @PLLM: Division factor for PLL VCO input clock. Range 2 - 63 he software has to set these bits correctly to ensure that the VCO input frequency
+ * ranges from 1 to 2 MHz.
+ *
+ * @PLLN: Multiplication factor for PLL VCO output clock. This parameter must be a number between Min_Data = 50 and Max_Data = 432
+ * except for STM32F411xE devices where the Min_Data = 192
+ *
+ * @PLLP: Division factor for main system clock (SYSCLK)
+ *
+ * @PLLQ: Division factor for OTG FS, SDIO and RNG clocks. This parameter must be a number between Min_Data = 2 and Max_Data = 15
+ *
+ */
 
-
-
-
-
-
-// If we are using PLL as main clock source of system clock then we need to calculate it with equation :
-// SYSCLK = PLLSource / M  * N	/ P (this value is then going on AHB and ABP prescalers
-// Clock for OTG FS, SDIO and RNG = PLLSource /M *N /Q (straight to those peripherals)
-//
-typedef struct
+/*
+ * Structure to hold PLL parameters
+ */
+typedef struct RCC_PLLInitTypeDef
 {
-	int8_t PLLState; /*! @PLLState The new state of the PLL*/
+	int8_t PLLState; 	//@PLLState
 
-	uint8_t PLLSource; /*! @PLLSource - HSI or HSE  */
+	uint8_t PLLSource;	//@PLLSource
 
-	uint8_t PLLM; /*!< PLLM: Division factor for PLL VCO input clock. Range 2 - 63  */
-	//The software has to set these bits correctly to ensure that the VCO input frequency
-	//ranges from 1 to 2 MHz.
-	//!!!It is recommended to select a frequency of 2 MHz to limit PLL jitter!!!
+	uint8_t PLLM;		//@PLLM
 
-	uint16_t PLLN; /*!< PLLN: Multiplication factor for PLL VCO output clock.
-	 This parameter must be a number between Min_Data = 50 and Max_Data = 432
-	 except for STM32F411xE devices where the Min_Data = 192 */
+	uint16_t PLLN;		//@PLLN
 
-	uint8_t PLLP; /*!< @PLLP PLLP: Division factor for main system clock (SYSCLK).*/
+	uint8_t PLLP;		//@PLLP
 
-	uint8_t PLLQ; /*!< PLLQ: Division factor for OTG FS, SDIO and RNG clocks.
-	 This parameter must be a number between Min_Data = 2 and Max_Data = 15    */
+	uint8_t PLLQ; 		//@PLLQ
 
-}RCC_PLLInitTypeDef;
+} RCC_PLLInitTypeDef;
 
-typedef struct
+/*
+ * Structure to hold Clock parameters
+ */
+typedef struct RCC_ClockInitTypeDef
 {
 
+	uint8_t OscillatorType; //@OscillatorType
 
-	uint32_t OscillatorType; /*!< The oscillators to be configured.   */
+	uint8_t VOSScale;		//@VOSScale
 
-  uint32_t HSEState;             /*!< The new state of the HSE.
-                                      This parameter can be a value of @ref RCC_HSE_Config                        */
+	uint8_t FLASHLatency;	//@FlashLatency
 
-  uint32_t LSEState;             /*!< The new state of the LSE.
-                                      This parameter can be a value of @ref RCC_LSE_Config                        */
+	uint8_t HPREPrescaler;	//@AHB_Prescaler
 
-  uint32_t HSIState;             /*!< The new state of the HSI.
-                                      This parameter can be a value of @ref RCC_HSI_Config                        */
+	uint8_t APB1Prescaler; 	//@APB1_Prescaler
 
-  uint32_t HSICalibrationValue;  /*!< The HSI calibration trimming value (default is RCC_HSICALIBRATION_DEFAULT).
-                                       This parameter must be a number between Min_Data = 0x00 and Max_Data = 0x1F */
+	uint8_t APB2Prescaler; //@APB2_Prescaler
 
-  uint32_t LSIState;             /*!< The new state of the LSI.
-                                      This parameter can be a value of @ref RCC_LSI_Config                        */
+	RCC_PLLInitTypeDef PLL;
 
-  RCC_PLLInitTypeDef PLL;        /*!< PLL structure parameters                                                    */
-}RCC_OscInitTypeDef;
+} RCC_ClockInitTypeDef;
+
+/*
+ HSI/HSE/LSI/LSE
+ @OscillatorType
+ */
+#define RCC_OSCILLATORTYPE_HSI	0U
+#define RCC_OSCILLATORTYPE_HSE	1U
 
 /*
  Main PLL(PLL) and audio PLL (PLLI2S) entry clock source
@@ -80,7 +93,6 @@ typedef struct
 #define RCC_PLL_STATE_DISABLE	0U
 #define RCC_PLL_STATE_ENABLE	1U
 
-
 /*
  PLLP: Main PLL (PLL) division factor for main system clock
  @PLLP
@@ -91,49 +103,109 @@ typedef struct
 #define RCC_PLLP_DIV8			3U
 
 /*
-System clock switch
-Set and cleared by software to select the system clock source.
-Set by hardware to force the HSI selection when leaving the Stop or Standby mode or in
-case of failure of the HSE oscillator used directly or indirectly as the system clock.
-*/
+ System clock switch
+ Set and cleared by software to select the system clock source.
+ Set by hardware to force the HSI selection when leaving the Stop or Standby mode or in
+ case of failure of the HSE oscillator used directly or indirectly as the system clock.
+ */
 #define RCC_SW_HSI				0U
 #define RCC_SW_HSE				1U
 #define RCC_SW_PLL				2U
 
 /*
-AHB prescaler
-Set and cleared by software to control AHB clock division factor
+ @AHB_Prescaler
+ SYSYCLOCK/Prescaler = HCLK
  */
-#define RCC_HPRE_DIV2			0U
-#define RCC_HPRE_DIV4			1U
-#define RCC_HPRE_DIV8			2U
-#define RCC_HPRE_DIV16			3U
-#define RCC_HPRE_DIV64			4U
-#define RCC_HPRE_DIV128			5U
-#define RCC_HPRE_DIV256			6U
-#define RCC_HPRE_DIV512			7U
+#define RCC_HPRE_PRESCALER_NODIV			0U
+#define RCC_HPRE_PRESCALER_DIV2				8U
+#define RCC_HPRE_PRESCALER_DIV4				9U
+#define RCC_HPRE_PRESCALER_DIV8				10U
+#define RCC_HPRE_PRESCALER_DIV16			11U
+#define RCC_HPRE_PRESCALER_DIV64			12U
+#define RCC_HPRE_PRESCALER_DIV128			13U
+#define RCC_HPRE_PRESCALER_DIV256			14U
+#define RCC_HPRE_PRESCALER_DIV512			15U
 
 /*
-APB Low speed prescaler (APB1)
-Set and cleared by software to control APB low-speed clock division factor
+ @APB1_Prescaler
+ APB Low speed prescaler (APB1)
+ Set and cleared by software to control APB low-speed clock division factor
  */
 
-#define RCC_ABP1_PRESCALER_DIV2		0U
-#define RCC_ABP1_PRESCALER_DIV4		1U
-#define RCC_ABP1_PRESCALER_DIV8		2U
-#define RCC_ABP1_PRESCALER_DIV16	3U
+#define RCC_ABP1_PRESCALER_NODIV	0U
+#define RCC_ABP1_PRESCALER_DIV2		4U
+#define RCC_ABP1_PRESCALER_DIV4		5U
+#define RCC_ABP1_PRESCALER_DIV8		6U
+#define RCC_ABP1_PRESCALER_DIV16	7U
 
 /*
-APB high-speed prescaler (APB2)
-Set and cleared by software to control APB high-speed clock division factor
+ @APB2_Prescaler
+ APB high-speed prescaler (APB2)
+ Set and cleared by software to control APB high-speed clock division factor
  */
 
-#define RCC_ABP2_PRESCALER_DIV2		0U
-#define RCC_ABP2_PRESCALER_DIV4		1U
-#define RCC_ABP2_PRESCALER_DIV8		2U
-#define RCC_ABP2_PRESCALER_DIV16	3U
+#define RCC_ABP2_PRESCALER_NODIV	0U
+#define RCC_ABP2_PRESCALER_DIV2		4U
+#define RCC_ABP2_PRESCALER_DIV4		5U
+#define RCC_ABP2_PRESCALER_DIV8		6U
+#define RCC_ABP2_PRESCALER_DIV16	7U
 
-// error messages
-#define PLL_CONFIG_ERROR		1
+/*
+ @VOSScale
+ These bits control the main internal voltage regulator output voltage to achieve a trade-off
+ between performance and power consumption. This should be assigned to PWR_register
+ Scale 2 when 60MHz < HCLK < 84Mhz
+ Scale 3 when HCLK < 60Mhz
+ */
+#define RCC_VOS_SCALE3		1U
+#define RCC_VOS_SCALE2		2U
 
+/*
+ @FlashLatency
+ These bits represent the ratio of the CPU clock period to the Flash memory access time.
+ */
+#define RCC_FLASHLATENCY_0WS	0U
+#define RCC_FLASHLATENCY_1WS	1U
+#define RCC_FLASHLATENCY_2WS	2U
+#define RCC_FLASHLATENCY_3WS	3U
+#define RCC_FLASHLATENCY_4WS	4U
+#define RCC_FLASHLATENCY_5WS	5U
+#define RCC_FLASHLATENCY_6WS	6U
+
+
+/*
+ Errors
+ */
+#define PLL_CONFIG_ERROR		1U
+
+/*
+ Clock enable macros
+ */
+#define RCC_CLOCK_GPIOA_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+#define RCC_CLOCK_GPIOB_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+#define RCC_CLOCK_GPIOC_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+#define RCC_CLOCK_GPIOD_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+#define RCC_CLOCK_GPIOE_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
+#define RCC_CLOCK_GPIOH_ENABLE()	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
+
+#define RCC_CLOCK_I2C1_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+#define RCC_CLOCK_I2C2_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
+#define RCC_CLOCK_I2C3_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_I2C3EN;
+
+/*
+ Clock disable macros
+ */
+#define RCC_CLOCK_GPIOA_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIOAEN);
+#define RCC_CLOCK_GPIOB_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIOBEN);
+#define RCC_CLOCK_GPIOC_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIOCEN);
+#define RCC_CLOCK_GPIOD_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIODEN);
+#define RCC_CLOCK_GPIOE_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIOEEN);
+#define RCC_CLOCK_GPIOH_DISABLE()	RCC->AHB1ENR &= ~(RCC_AHB1ENR_GPIOHEN);
+
+#define RCC_CLOCK_I2C1_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN);
+#define RCC_CLOCK_I2C2_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C2EN);
+#define RCC_CLOCK_I2C3_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C3EN);
+
+
+uint8_t RCC_InitClock(RCC_ClockInitTypeDef *pClockInit);
 #endif /* MYDRIVERS_INC_STM32F401XE_RCC_H_ */

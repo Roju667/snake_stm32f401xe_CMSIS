@@ -6,6 +6,7 @@
  */
 
 #include "stm32f401xe_GPIO.h"
+#include "stm32f401xe_RCC.h"
 
 /*
  * Start clock for GPIO
@@ -13,31 +14,31 @@
  * @param[*GPIO] - base address of gpiox peripheral
  * @return - void
  */
-void GPIO_ClockEnable(GPIO_TypeDef *GPIO)
+static void GPIO_ClockEnable(GPIO_TypeDef *GPIO)
 {
 	if (GPIO == GPIOA)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+		RCC_CLOCK_GPIOA_ENABLE();
 	}
 	else if (GPIO == GPIOB)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+		RCC_CLOCK_GPIOB_ENABLE();
 	}
 	else if (GPIO == GPIOC)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+		RCC_CLOCK_GPIOC_ENABLE();
 	}
 	else if (GPIO == GPIOD)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+		RCC_CLOCK_GPIOD_ENABLE();
 	}
 	else if (GPIO == GPIOE)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
+		RCC_CLOCK_GPIOE_ENABLE();
 	}
 	else if (GPIO == GPIOH)
 	{
-		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
+		RCC_CLOCK_GPIOH_ENABLE();
 	}
 
 }

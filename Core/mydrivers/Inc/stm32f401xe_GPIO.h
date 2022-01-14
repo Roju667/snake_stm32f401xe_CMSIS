@@ -108,7 +108,7 @@ typedef struct
 								        (x == GPIOE)?4:\
 								        (x == GPIOH)?7:0)
 
-void GPIO_ClockEnable(GPIO_TypeDef *GPIO);
+
 void GPIO_InitPin(GPIO_Handle_t *hGPIO);
 void GPIO_WritePin(GPIO_TypeDef *GPIO, uint8_t PinNumber, uint8_t PinState);
 void GPIO_TogglePin(GPIO_TypeDef *GPIO, uint8_t PinNumber);
