@@ -71,7 +71,7 @@ typedef struct
 #define GPIO_PIN_SPEED_LOW			0U
 #define GPIO_PIN_SPEED_MEDIUM		1U
 #define GPIO_PIN_SPEED_HIGH			2U
-#define GPIO_PIN_SPEED_VERYHIGH		0U
+#define GPIO_PIN_SPEED_VERYHIGH		3U
 
 // @GPIOPullUpPullDown
 #define GPIO_PIN_PUPD_NOPULL		0U

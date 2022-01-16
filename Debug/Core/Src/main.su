@@ -1,3 +1,5 @@
-main.c:16:5:main	24	static
-main.c:48:6:EXTI15_10_IRQHandler	8	static
-main.c:56:6:SysClockInit	24	static
+main.c:19:5:main	24	static
+main.c:44:6:EXTI15_10_IRQHandler	8	static
+main.c:52:6:SysClockInit	24	static
+main.c:73:6:GPIOConfig	24	static
+main.c:91:6:I2C1Config	16	static

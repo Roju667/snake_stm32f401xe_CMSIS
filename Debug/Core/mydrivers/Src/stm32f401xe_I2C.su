@@ -1,3 +1,4 @@
 stm32f401xe_I2C.c:18:13:I2C_ClockEnable	16	static
 stm32f401xe_I2C.c:34:13:I2C_InitGPIOPins	40	static
-stm32f401xe_I2C.c:152:9:I2C_Init	16	static
+stm32f401xe_I2C.c:144:9:I2C_Init	24	static
+stm32f401xe_I2C.c:211:9:I2C_Transmit	24	static
