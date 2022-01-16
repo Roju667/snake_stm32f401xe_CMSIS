@@ -215,6 +215,7 @@ uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t pMemAddre
 	phI2C->pI2Cx->CR1 |= I2C_CR1_ACK;
 	phI2C->pI2Cx->CR1 |= I2C_CR1_START;
 
+// without this wait i2c is not working so far
 	for (uint32_t i = 0; i < 8400; i++)
 	{
 
