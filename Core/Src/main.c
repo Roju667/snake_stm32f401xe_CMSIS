@@ -55,9 +55,35 @@ int main()
 
 void EXTI15_10_IRQHandler()
 {
+	uint8_t _tempGPIOPin;
+	// if button is clicked
+	if (EXTI->PR & (0b1 << SNEK_BUTTON_DOWN))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_DOWN);
+		_tempGPIOPin = SNEK_BUTTON_DOWN;
+	}
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_UP))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_UP);
+		_tempGPIOPin = SNEK_BUTTON_UP;
+	}
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_LEFT))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_LEFT);
+		_tempGPIOPin = SNEK_BUTTON_LEFT;
+	}
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_RIGHT))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_RIGHT);
+		_tempGPIOPin = SNEK_BUTTON_RIGHT;
+	}
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_ENTER))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_ENTER);
+		_tempGPIOPin = SNEK_BUTTON_ENTER;
+	}
 
-	GPIO_ClearPendingEXTIFlag(GPIO_PIN_13);
-	GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	Snek_ButtonCallback(_tempGPIOPin);
 }
 
 void SysTick_Handler()
@@ -95,14 +121,25 @@ void GPIOConfig(void)
 	GPIOx.PinConfig.OutputType = GPIO_PIN_OT_PP;
 	GPIOx.PinConfig.PullUpPullDown = GPIO_PIN_PUPD_NOPULL;
 	GPIOx.pGPIOx = GPIOA;
-
 	GPIO_InitPin(&GPIOx);
 
 	GPIOx.PinConfig.PinNumber = GPIO_PIN_13;
 	GPIOx.PinConfig.Mode = GPIO_PIN_MODE_EXTI_FT;
-	GPIOx.pGPIOx = GPIOC;
-
+	GPIOx.pGPIOx = GPIOB;
 	GPIO_InitPin(&GPIOx);
+
+	GPIOx.PinConfig.PinNumber = GPIO_PIN_14;
+	GPIO_InitPin(&GPIOx);
+
+	GPIOx.PinConfig.PinNumber = GPIO_PIN_15;
+	GPIO_InitPin(&GPIOx);
+//
+//	GPIOx.PinConfig.PinNumber = GPIO_PIN_1;
+//	GPIO_InitPin(&GPIOx);
+//
+//	GPIOx.PinConfig.PinNumber = GPIO_PIN_2;
+//	GPIO_InitPin(&GPIOx);
+	
 }
 
 void I2C1Config(I2C_Handle_t *phI2C1)

@@ -38,6 +38,7 @@ typedef struct
 // @PinNumber
 #define GPIO_PIN_0					0U
 #define GPIO_PIN_1					1U
+#define GPIO_PIN_2					2U
 #define GPIO_PIN_3					3U
 #define GPIO_PIN_4					4U
 #define GPIO_PIN_5					5U
