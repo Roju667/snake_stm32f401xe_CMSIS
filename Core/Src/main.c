@@ -10,15 +10,24 @@
 #include "stm32f401xe_GPIO.h"
 #include "stm32f401xe_RCC.h"
 #include "stm32f401xe_I2C.h"
+#include "SSD1306_OLED.h"
+#include "GFX_BW.h"
 #include "stdint.h"
+#include "font_8x5.h"
+#include "stdio.h"
+#include "Snek.h"
 
 void SysClockInit(void);
 void GPIOConfig(void);
 void I2C1Config(I2C_Handle_t *phI2C1);
 
+volatile uint32_t TickS;
+
 int main()
 {
 	I2C_Handle_t hI2C1;
+
+	SysTick_Config(84000000);
 
 	// Configure RCC
 	SysClockInit();
@@ -28,16 +37,19 @@ int main()
 
 	// Configure I2C peripherals
 	I2C1Config(&hI2C1);
+	SSD1306_Init(&hI2C1);
 
-	I2C_Transmit(&hI2C1, 60, 2);
+	SSD1306_Clear(SSD1306_COLOR_BLACK);
+	GFX_SetFont(font_8x5);
+
+	SSD1306_Display();
+
+
+
 
 	while(1)
 	{
-		for(uint32_t i = 0 ; i < 8400000 ; i++)
-		{
-
-		}
-		GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		Snek();
 	}
 }
 
@@ -46,6 +58,11 @@ void EXTI15_10_IRQHandler()
 
 	GPIO_ClearPendingEXTIFlag(GPIO_PIN_13);
 	GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+}
+
+void SysTick_Handler()
+{
+	TickS++;
 }
 
 // system clock init function

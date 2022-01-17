@@ -86,5 +86,5 @@ typedef struct
 #define I2C_ERROR_WRONG_FREQUENCY 1U
 
 uint8_t I2C_Init(I2C_Handle_t *phI2C);
-uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t pMemAddress);
+uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t MemAddress, uint8_t *pDataBuffer,uint32_t DataSize);
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */

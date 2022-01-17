@@ -1,0 +1,4 @@
+Snek.c:18:17:Snek_DrawButton	40	static
+Snek.c:37:13:Snek_Init	4	static
+Snek.c:47:13:Snek_MenuMain	8	static
+Snek.c:79:6:Snek	8	static

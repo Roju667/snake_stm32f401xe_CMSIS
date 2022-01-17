@@ -164,7 +164,7 @@ uint8_t I2C_Init(I2C_Handle_t *phI2C)
 	phI2C->pI2Cx->CR2 |= (phI2C->I2CConfig.ABP1FrequencyMHz << I2C_CR2_FREQ_Pos);
 
 	// set speed
-	uint16_t tempCCR, tempTRISE;
+	uint16_t _tempCCR, _tempTRISE;
 	// set slow mode, reset DUTY
 	phI2C->pI2Cx->CCR &= ~(I2C_CCR_FS);
 	phI2C->pI2Cx->CCR &= ~(I2C_CCR_DUTY);
@@ -172,10 +172,10 @@ uint8_t I2C_Init(I2C_Handle_t *phI2C)
 
 	// CCR calculation for slow mode -> values are coming from RM CCR register and result is in [ns]
 	// (Thigh + Tlow) / (CEOFF * PCLK)
-	tempCCR = (I2C_CCR_SM_THIGH + I2C_CCR_SM_TLOW) / (I2C_CCR_SM_COEFF * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
+	_tempCCR = (I2C_CCR_SM_THIGH + I2C_CCR_SM_TLOW) / (I2C_CCR_SM_COEFF * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
 
 	// TRISE calculation for slow mode -> equation is from RM
-	tempTRISE = ((I2C_CCR_SM_TR_SCL * phI2C->I2CConfig.ABP1FrequencyMHz) / 1000) + 1;
+	_tempTRISE = ((I2C_CCR_SM_TR_SCL * phI2C->I2CConfig.ABP1FrequencyMHz) / 1000) + 1;
 
 	// fast mode
 	if (phI2C->I2CConfig.Speed != I2C_SPEED_SLOW)
@@ -183,23 +183,23 @@ uint8_t I2C_Init(I2C_Handle_t *phI2C)
 		// set fast mode
 		phI2C->pI2Cx->CCR |= I2C_CCR_FS;
 		// calculate CCR for fast mode with DUTY 0
-		tempCCR = (I2C_CCR_FM_THIGH + I2C_CCR_FM_TLOW) / (I2C_CCR_FM_COEFF_DUTY0 * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
+		_tempCCR = (I2C_CCR_FM_THIGH + I2C_CCR_FM_TLOW) / (I2C_CCR_FM_COEFF_DUTY0 * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
 		// calculate TRISE for fast mode
-		tempTRISE = ((I2C_CCR_FM_TR_SCL * phI2C->I2CConfig.ABP1FrequencyMHz) / 1000) + 1;
+		_tempTRISE = ((I2C_CCR_FM_TR_SCL * phI2C->I2CConfig.ABP1FrequencyMHz) / 1000) + 1;
 		if (phI2C->I2CConfig.Speed == I2C_SPEED_FAST_DUTY1)
 		{
 			// set DUTY flag
 			phI2C->pI2Cx->CCR |= I2C_CCR_DUTY;
 			// calculate CCR with fast mode DUTY1
-			tempCCR = (I2C_CCR_FM_THIGH + I2C_CCR_FM_TLOW) / (I2C_CCR_FM_COEFF_DUTY1 * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
+			_tempCCR = (I2C_CCR_FM_THIGH + I2C_CCR_FM_TLOW) / (I2C_CCR_FM_COEFF_DUTY1 * (1000 / phI2C->I2CConfig.ABP1FrequencyMHz));
 		}
 	}
 	phI2C->pI2Cx->CCR &= ~(I2C_CCR_CCR);
-	phI2C->pI2Cx->CCR |= (tempCCR << I2C_CCR_CCR_Pos);
+	phI2C->pI2Cx->CCR |= (_tempCCR << I2C_CCR_CCR_Pos);
 
 	// write correct TRISE to the register
 	phI2C->pI2Cx->TRISE &= ~(I2C_TRISE_TRISE);
-	phI2C->pI2Cx->TRISE |= (tempTRISE << I2C_TRISE_TRISE_Pos);
+	phI2C->pI2Cx->TRISE |= (_tempTRISE << I2C_TRISE_TRISE_Pos);
 
 
 	// enable I2c
@@ -208,37 +208,65 @@ uint8_t I2C_Init(I2C_Handle_t *phI2C)
 	return 0;
 }
 
-uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t pMemAddress)
+uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t MemAddress, uint8_t *pDataBuffer,uint32_t DataSize)
 {
-	uint8_t temp8reg;
-//1. Set START BIT
+	uint8_t _temp8reg;
+	uint32_t _txDataToSend = DataSize;
+	uint32_t _txDataIndex = 0;
+//1.0 Set START BIT
 	phI2C->pI2Cx->CR1 |= I2C_CR1_ACK;
 	phI2C->pI2Cx->CR1 |= I2C_CR1_START;
 
-// without this wait i2c is not working so far
-	for (uint32_t i = 0; i < 8400; i++)
-	{
-
-	}
-
+//1.1 Wait until SB flag is set
+	while (!(I2C_SR1_SB & phI2C->pI2Cx->SR1))
+		;
+//1.2 Clear SB by reading SR1
+	_temp8reg = phI2C->pI2Cx->SR1;
 //2. Put slave address in DR register - If transmitting set slave addres LSB to 0, reciever 1
 	phI2C->pI2Cx->DR = (SlaveAddres << 1);
 //3. ADDR bit set by hardware
+
 	// wait until ADDR is set
 	while (!(I2C_SR1_ADDR & phI2C->pI2Cx->SR1))
 		;
 //4. ADDR is cleared by reading SR1 , Read SR2
-	temp8reg = phI2C->pI2Cx->SR1;
-	temp8reg = phI2C->pI2Cx->SR2;
+	_temp8reg = phI2C->pI2Cx->SR1;
+	_temp8reg = phI2C->pI2Cx->SR2;
 //5. TxE bit is set when acknowledge bit is sent
 	while (!(phI2C->pI2Cx->SR1 & I2C_SR1_TXE))
 		;
 //6. Write memory address to DR to clear TxE
-	phI2C->pI2Cx->DR = pMemAddress;
-	while (!(phI2C->pI2Cx->SR1 & I2C_SR1_TXE))
-		;
-//7. After last bit is written to DR register , Set STOP bit  and interface is going back to slave mode
-	phI2C->pI2Cx->CR1 |= I2C_CR1_STOP;
+	phI2C->pI2Cx->DR = MemAddress;
+
+//7. Data transfer
+	while(_txDataToSend > 0)
+	{
+		// wait until data register is empty
+		while (!(phI2C->pI2Cx->SR1 & I2C_SR1_TXE))
+			;
+
+		// put data in data register
+		phI2C->pI2Cx->DR = pDataBuffer[_txDataIndex];
+
+		//change counters
+		_txDataToSend--;
+		_txDataIndex++;
+
+
+//8. After last bit is written to DR register , Set STOP bit  and interface is going back to slave mode
+		if(_txDataToSend == 0)
+		{
+			// check if data transfer is finsihed
+			while (!(phI2C->pI2Cx->SR1 & I2C_SR1_BTF))
+				;
+			// stop transfer
+			phI2C->pI2Cx->CR1 |= I2C_CR1_STOP;
+
+
+		}
+
+	}
+
 
 	return 0;
 }
