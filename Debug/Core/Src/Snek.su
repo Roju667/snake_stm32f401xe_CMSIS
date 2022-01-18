@@ -1,6 +1,0 @@
-Snek.c:17:13:Snek_DrawButton	40	static
-Snek.c:38:13:Snek_Init	4	static
-Snek.c:51:13:Snek_MenuMain	8	static
-Snek.c:138:13:Snek_Game	112	static
-Snek.c:166:6:Snek	8	static
-Snek.c:196:6:Snek_ButtonCallback	16	static

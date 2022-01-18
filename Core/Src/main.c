@@ -14,6 +14,7 @@
 #include "GFX_BW.h"
 #include "stdint.h"
 #include "font_8x5.h"
+#include "stddef.h"
 #include "stdio.h"
 #include "Snek.h"
 
@@ -49,7 +50,7 @@ int main()
 
 	while(1)
 	{
-		Snek();
+		snek();
 	}
 }
 
@@ -64,7 +65,7 @@ void EXTI1_IRQHandler(void)
 		_tempGPIOPin = SNEK_BUTTON_RIGHT;
 	}
 
-	Snek_ButtonCallback(_tempGPIOPin);
+	snek_button_callback(_tempGPIOPin);
 }
 
 // handler for button DOWN
@@ -78,7 +79,7 @@ void EXTI2_IRQHandler(void)
 		_tempGPIOPin = SNEK_BUTTON_DOWN;
 	}
 
-	Snek_ButtonCallback(_tempGPIOPin);
+	snek_button_callback(_tempGPIOPin);
 }
 
 // handler for buttons up/left/enter
@@ -103,7 +104,7 @@ void EXTI15_10_IRQHandler(void)
 		_tempGPIOPin = SNEK_BUTTON_ENTER;
 	}
 
-	Snek_ButtonCallback(_tempGPIOPin);
+	snek_button_callback(_tempGPIOPin);
 }
 
 void SysTick_Handler()

@@ -18,7 +18,7 @@ typedef enum
 	GAMESTATE_MENUSETTINGS,
 	GAMESTATE_GAME,
 	GAMESTATE_OVER
-}GameState_t;
+} game_state_t;
 
 typedef enum
 {
@@ -26,7 +26,7 @@ typedef enum
 	BUTTON_SCORES,
 	BUTTON_SETTINGS,
 	BUTTON_ABOUT
-}MenuButtons_t;
+} menu_buttons_t;
 
 #define SNEK_SET_BIT(ControlRegister,Bit)		(ControlRegister |= (1U << Bit))
 #define SNEK_RESET_BIT(ControlRegister,Bit)		(ControlRegister &= ~(1U << Bit))
@@ -60,18 +60,55 @@ typedef enum
 #define SNEK_UI_BUTTON_OFFSET					16U		// number of pixels from 1 button start to next one
 #define SNEK_UI_CHAR_OFFSET						4U		// number of pixels from button border to char
 
-typedef struct Snek
+//we take 48 x 128 game screen and divide it to 8x8 suqares that will be food or snake parts
+#define SNEK_UI_GAME_HEIGHT						48U
+#define SNEK_UI_GAME_WIDTH						128U
+#define SNEK_UI_NODE_HEIGHT						8U
+#define SNEK_UI_NODE_WIDTH						8U
+#define SNEK_UI_NO_NODES						((SNEK_UI_GAME_HEIGHT / SNEK_UI_NODE_HEIGHT) * (SNEK_UI_GAME_WIDTH / SNEK_UI_NODE_WIDTH))
+
+#define SNEK_GAME_HEAD_STARTPOS					8 + (3 * 16)
+
+// linked list to save snek shape and fruity
+typedef struct node_t
+{
+
+	uint8_t node_taken; // node taken flag
+
+	uint8_t node_x; // y position
+
+	uint8_t node_y; // x position
+
+	uint8_t node_array_pos;  // position in the array x + (y*16)
+
+	uint8_t last_node_pos; // last node position in array
+
+	uint8_t next_node_pos; // next node position in array
+
+} node_t;
+
+
+typedef struct snek_game_t
 {
 	// enum state machine
-	GameState_t State;
+	game_state_t game_state;
 	// enum buttons names
-	MenuButtons_t Buttons;
+	menu_buttons_t menu_buttons;
 	// control register 1
-	uint16_t CR1;
-} Snek_t;
+	volatile uint16_t CR1;
+	// game map that will contain snake shape and fruit
+	node_t game_map[SNEK_UI_NO_NODES];
+	// snek first node 'address'
+	uint8_t head_address;
+	// snek last node
+	uint8_t tail_address;
+	// snek lenght
+	uint16_t snek_lenght;
+
+} snek_game_t;
 
 
-void Snek(void);
-void Snek_ButtonCallback(uint8_t GPIO_Pin);
+void snek(void);
+void snek_button_callback(uint8_t GPIO_Pin);
 
 #endif /* INC_SNEK_H_ */

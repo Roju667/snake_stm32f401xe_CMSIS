@@ -2,6 +2,7 @@
 "./Core/Src/SSD1306_OLED.o"
 "./Core/Src/Snek.o"
 "./Core/Src/main.o"
+"./Core/Src/snekmap.o"
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32f4xx.o"

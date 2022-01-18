@@ -9,6 +9,7 @@ C_SRCS += \
 ../Core/Src/SSD1306_OLED.c \
 ../Core/Src/Snek.c \
 ../Core/Src/main.c \
+../Core/Src/snekmap.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
 ../Core/Src/system_stm32f4xx.c 
@@ -18,6 +19,7 @@ OBJS += \
 ./Core/Src/SSD1306_OLED.o \
 ./Core/Src/Snek.o \
 ./Core/Src/main.o \
+./Core/Src/snekmap.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
 ./Core/Src/system_stm32f4xx.o 
@@ -27,6 +29,7 @@ C_DEPS += \
 ./Core/Src/SSD1306_OLED.d \
 ./Core/Src/Snek.d \
 ./Core/Src/main.d \
+./Core/Src/snekmap.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \
 ./Core/Src/system_stm32f4xx.d 
