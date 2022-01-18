@@ -1,0 +1,8 @@
+Snek.c:17:13:snek_ui_drawbutton	40	static
+Snek.c:38:13:snek_gamestate_init	4	static
+Snek.c:51:13:snek_gamesate_mainmenu	8	static
+Snek.c:141:13:snek_map_clearmap	16	static
+Snek.c:146:13:snek_map_createnode	16	static
+Snek.c:172:13:snek_gamestate_game	16	static
+Snek.c:204:6:snek	8	static
+Snek.c:234:6:snek_button_callback	16	static
