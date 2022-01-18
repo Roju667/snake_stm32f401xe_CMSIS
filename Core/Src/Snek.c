@@ -12,23 +12,24 @@
 #include "stdint.h"
 #include "Snek.h"
 
-Snek_t SNEK;
+volatile Snek_t SNEK;
 
-static uint16_t Snek_DrawButton(uint8_t *Text, uint8_t Count, uint8_t Select)
+static void Snek_DrawButton(uint8_t *Text, uint8_t Count, uint8_t Select)
 {
+	// lcd width - char size - spaces between chars
 	uint8_t _tempX = ((SSD1306_LCDWIDTH - (strlen((char*) Text) * 5) - strlen((char*) Text))) / 2;
 
-	GFX_DrawFillRectangle(0, Count * 16, 128, 15, SSD1306_COLOR_BLACK);
+	GFX_DrawFillRectangle(0, Count * SNEK_UI_BUTTON_OFFSET, SNEK_UI_BUTTON_WIDTH, SNEK_UI_BUTTON_HEIGHT, SSD1306_COLOR_BLACK);
 	//draw selected button
 	if (Select)
 	{
-		GFX_DrawFillRectangle(0, Count * 16, 128, 15, SSD1306_COLOR_YELLOWBLUE);
-		GFX_DrawString(_tempX, (Count * 16) + 4, (char*) Text, SSD1306_COLOR_BLACK, SSD1306_COLOR_YELLOWBLUE);
+		GFX_DrawFillRectangle(0, Count * SNEK_UI_BUTTON_OFFSET, SNEK_UI_BUTTON_WIDTH, SNEK_UI_BUTTON_HEIGHT, SSD1306_COLOR_YELLOWBLUE);
+		GFX_DrawString(_tempX, (Count * SNEK_UI_BUTTON_OFFSET) + SNEK_UI_CHAR_OFFSET, (char*) Text, SSD1306_COLOR_BLACK, SSD1306_COLOR_YELLOWBLUE);
 	}
 	else // draw unselected button
 	{
-		GFX_DrawRectangle(0, Count * 16, 128, 15, SSD1306_COLOR_YELLOWBLUE);
-		GFX_DrawString(_tempX, (Count * 16) + 4, (char*) Text, SSD1306_COLOR_YELLOWBLUE, SSD1306_COLOR_BLACK);
+		GFX_DrawRectangle(0, Count * SNEK_UI_BUTTON_OFFSET, SNEK_UI_BUTTON_WIDTH, SNEK_UI_BUTTON_HEIGHT, SSD1306_COLOR_YELLOWBLUE);
+		GFX_DrawString(_tempX, (Count * SNEK_UI_BUTTON_OFFSET) + SNEK_UI_CHAR_OFFSET, (char*) Text, SSD1306_COLOR_YELLOWBLUE, SSD1306_COLOR_BLACK);
 	}
 
 	return 0;
@@ -77,7 +78,7 @@ static void Snek_MenuMain(void)
 
 		case (BUTTON_SETTINGS):
 			Snek_DrawButton((uint8_t*) "Settings", 2, 1);
-			SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_SETTIGNS);
+			SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_SETTINGS);
 			break;
 
 		case (BUTTON_ABOUT):
@@ -88,8 +89,6 @@ static void Snek_MenuMain(void)
 
 		// sent data to OLED
 		SSD1306_Display();
-
-		// clear bit to draw on OLED
 		SNEK_RESET_BIT(SNEK.CR1, SNEK_CR1_DRAW_OLED);
 	}
 
@@ -98,18 +97,69 @@ static void Snek_MenuMain(void)
 	{
 		// move button cursor down
 		SNEK.Buttons = (SNEK.Buttons + 1) % 4;
-		// set draw
 		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_DRAW_OLED);
-		// reset button clicked
 		SNEK_RESET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_DOWN);
 	}
 
+	// check if button up is clicked
 	if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_BUTTON_UP))
 	{
 		// move button up
 		SNEK.Buttons = (SNEK.Buttons + 3) % 4;
 		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_DRAW_OLED);
 		SNEK_RESET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_UP);
+	}
+
+	// check if enter is clicked
+	if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_BUTTON_ENTER))
+	{
+		// change menu screen
+		if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_START))
+		{
+			SNEK.State = GAMESTATE_GAME;
+			SNEK_SET_BIT(SNEK.CR1 , SNEK_CR1_INIT_NEWSCREEN);
+		}
+		else if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_SCORES))
+		{
+			SNEK.State = GAMESTATE_MENUSCORES;
+		}
+		else if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_ABOUT))
+		{
+			SNEK.State = GAMESTATE_MENUABOUT;
+		}
+		else if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_ACTIVE_BUTTON_SETTINGS))
+		{
+			SNEK.State = GAMESTATE_MENUSETTINGS;
+		}
+
+	}
+}
+
+static void Snek_Game(void)
+{
+	// draw first screen
+	if(SNEK_CR1_INIT_NEWSCREEN)
+	{
+		// init map
+		uint8_t GameMap [6][16] = {0};
+		// clear screen
+		SSD1306_Clear(SSD1306_COLOR_BLACK);
+		// draw scorebox as a top button
+		GFX_DrawRectangle(0, 0, SNEK_UI_BUTTON_WIDTH, SNEK_UI_BUTTON_HEIGHT, SSD1306_COLOR_YELLOWBLUE);
+		GFX_DrawString(5, 0 + SNEK_UI_CHAR_OFFSET, "SNEK", SSD1306_COLOR_YELLOWBLUE, SSD1306_COLOR_BLACK);
+		GFX_DrawString(50, 0 + SNEK_UI_CHAR_OFFSET, "SCORE:", SSD1306_COLOR_YELLOWBLUE, SSD1306_COLOR_BLACK);
+		// draw snek
+
+
+		SSD1306_Display();
+		SNEK_RESET_BIT(SNEK.CR1,SNEK_CR1_INIT_NEWSCREEN);
+	}
+
+
+	// logic tick
+	if(SNEK_CHECK_BIT(SNEK.CR1,SNEK_CR1_DRAW_OLED))
+	{
+		SSD1306_Display();
 	}
 }
 
@@ -131,7 +181,11 @@ void Snek(void)
 	case GAMESTATE_MENUABOUT:
 		break;
 
+	case GAMESTATE_MENUSETTINGS:
+		break;
+
 	case GAMESTATE_GAME:
+		Snek_Game();
 		break;
 
 	case GAMESTATE_OVER:
@@ -141,16 +195,51 @@ void Snek(void)
 
 void Snek_ButtonCallback(uint8_t GPIO_Pin)
 {
-	if (GPIO_Pin == SNEK_BUTTON_DOWN)
+	// check if there is already movement to the side that button is clicked
+	// set button clicked bit in CR1
+	switch (GPIO_Pin)
 	{
-		// chcek if snek is no moving down already
+	// DOWN
+	case SNEK_BUTTON_DOWN:
+
 		if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_SNEKMOVE_DOWN))
 		{
 			return;
 		}
-
-		// set button down bit
 		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_DOWN);
+		break;
+		// UP
+	case SNEK_BUTTON_UP:
 
+		if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_SNEKMOVE_UP))
+		{
+			return;
+		}
+		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_UP);
+		break;
+		// LEFT
+	case SNEK_BUTTON_LEFT:
+
+		if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_SNEKMOVE_LEFT))
+		{
+			return;
+		}
+		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_LEFT);
+		break;
+		// RIGHT
+	case SNEK_BUTTON_RIGHT:
+
+		if (SNEK_CHECK_BIT(SNEK.CR1, SNEK_CR1_SNEKMOVE_RIGHT))
+		{
+			return;
+		}
+		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_RIGHT);
+		break;
+		// ENTER
+	case SNEK_BUTTON_ENTER:
+
+		SNEK_SET_BIT(SNEK.CR1, SNEK_CR1_BUTTON_ENTER);
+		break;
 	}
+
 }
