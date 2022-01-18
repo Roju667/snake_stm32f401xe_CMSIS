@@ -150,8 +150,8 @@ static void snek_map_createnode(snek_game_t *p_snek_game)
 	if (p_snek_game->snek_lenght == 0)
 	{
 		// create head somewhere in the middle
-		p_snek_game->game_map[SNEK_GAME_HEAD_STARTPOS]->node_taken = 1;
-		p_snek_game->game_map[SNEK_GAME_HEAD_STARTPOS]->last_node_pos = NULL;
+		p_snek_game->game_map[SNEK_GAME_HEAD_STARTPOS].node_taken = 1;
+		p_snek_game->game_map[SNEK_GAME_HEAD_STARTPOS].last_node_pos = (6 * 16 + 1);
 		p_snek_game->head_address = SNEK_GAME_HEAD_STARTPOS;
 		p_snek_game->snek_lenght++;
 		return;
@@ -176,7 +176,7 @@ static void snek_gamestate_game(void)
 	{
 
 	// set snake lenght as 0
-		g_snek_game.game_map->snek_lenght = 0;
+		g_snek_game.snek_lenght = 0;
 	// clear snake map
 		snek_map_clearmap(&g_snek_game);
 	// clear oled screen

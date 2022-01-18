@@ -8,7 +8,7 @@ Core/Src/Snek.o: ../Core/Src/Snek.c \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
  ../Core/Inc/SSD1306_OLED.h ../Core/mydrivers/Inc/stm32f401xe_I2C.h \
- ../Core/Inc/GFX_BW.h ../Core/Inc/Snek.h ../Core/Inc/snekmap.h
+ ../Core/Inc/GFX_BW.h ../Core/Inc/Snek.h
 
 ../Core/mydrivers/Inc/stm32f401xe_GPIO.h:
 
@@ -33,5 +33,3 @@ Core/Src/Snek.o: ../Core/Src/Snek.c \
 ../Core/Inc/GFX_BW.h:
 
 ../Core/Inc/Snek.h:
-
-../Core/Inc/snekmap.h:
