@@ -17,7 +17,7 @@ typedef enum
 	GAMESTATE_MENUABOUT,
 	GAMESTATE_MENUSETTINGS,
 	GAMESTATE_GAME,
-	GAMESTATE_OVER
+	GAMESTATE_OVER, GAMESTATE_SAVE
 } game_state_t;
 
 typedef enum
@@ -71,6 +71,13 @@ typedef enum
 #define SNEK_UI_NODE_HEIGHT						8U
 #define SNEK_UI_NODE_WIDTH						8U
 #define SNEK_UI_NO_NODES						((SNEK_UI_GAME_HEIGHT / SNEK_UI_NODE_HEIGHT) * (SNEK_UI_GAME_WIDTH / SNEK_UI_NODE_WIDTH))
+#define SNEK_UI_MAX_NAME_LENGHT					8U
+#define SNEK_UI_TXT_EDITOR_OFFSET_LEFT			40U
+#define SNEK_UI_TXT_EDITOR_OFFSET_BOTTOM		12U
+#define SNEK_UI_OK_BUTTON_POS_X					106U
+#define SNEK_UI_OK_BUTTON_POS_Y					50U
+#define SNEK_UI_OK_BUTTON_WIDTH					20U
+#define SNEK_UI_OK_BUTTON_HEIGHT				11U
 
 #define SNEK_GAME_HEAD_STARTPOS					8 + (3 * 16)
 #define SNEK_NULL_NODE							100U
@@ -88,27 +95,41 @@ typedef struct node_t
 
 } node_t;
 
+typedef struct txt_edit_t
+{
+
+	uint8_t pos; // node taken flag
+
+	uint8_t val; // last node position in array
+
+	uint8_t name[SNEK_UI_MAX_NAME_LENGHT]; // next node position in array
+
+} txt_edit_t;
+
+
 
 typedef struct snek_game_t
 {
-	// enum state machine
-	game_state_t game_state;
-	// enum buttons names
-	menu_buttons_t menu_buttons;
-	// control register 1
-	volatile uint16_t CR1;
-	// status register 1
-	volatile uint16_t SR1;
-	// fruity node
-	uint8_t fruity_node;
-	// game map that will contain snake shape and fruit
-	node_t game_map[SNEK_UI_NO_NODES];
-	// snek first node 'address'
-	uint8_t head_address;
-	// snek last node
-	uint8_t tail_address;
-	// snek lenght
-	uint16_t snek_lenght;
+
+	game_state_t game_state;			// enum state machine
+
+	menu_buttons_t menu_buttons;		// enum buttons names
+
+	volatile uint16_t CR1;				// control register 1
+
+	volatile uint16_t SR1;				// status register 1
+
+	uint8_t fruity_node;				// fruity node
+
+	node_t game_map[SNEK_UI_NO_NODES];	// game map that will contain snake shape and fruit
+
+	uint8_t head_address;				// snek first node 'address'
+
+	uint8_t tail_address;				// snek last node
+
+	uint16_t snek_lenght;				// snek lenght
+
+	txt_edit_t txt_edit;			// text editor struct
 
 } snek_game_t;
 
