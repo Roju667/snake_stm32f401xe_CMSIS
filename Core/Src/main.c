@@ -155,9 +155,9 @@ void GPIOConfig(void)
 	GPIOx.PinConfig.PinNumber = GPIO_PIN_15;
 	GPIO_InitPin(&GPIOx);
 
-//	GPIOx.PinConfig.PinNumber = GPIO_PIN_1;
-//	GPIO_InitPin(&GPIOx);
-//
+	GPIOx.PinConfig.PinNumber = GPIO_PIN_1;
+	GPIO_InitPin(&GPIOx);
+
 	GPIOx.PinConfig.PinNumber = GPIO_PIN_2;
 	GPIO_InitPin(&GPIOx);
 	

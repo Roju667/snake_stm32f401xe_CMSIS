@@ -32,21 +32,27 @@ typedef enum
 #define SNEK_RESET_BIT(ControlRegister,Bit)		(ControlRegister &= ~(1U << Bit))
 #define SNEK_CHECK_BIT(ControlRegister,Bit)		((ControlRegister >> Bit) & 1U)
 
+// control register
 #define SNEK_CR1_BUTTON_DOWN					0U		// button down clicked
 #define SNEK_CR1_BUTTON_UP						1U		// button up clicked
 #define SNEK_CR1_BUTTON_LEFT					2U		// button left clicked
 #define SNEK_CR1_BUTTON_RIGHT					3U		// button right clicked
-#define SNEK_CR1_SNEKMOVE_DOWN					4U		// snek is moving down
-#define SNEK_CR1_SNEKMOVE_UP					5U		// snek is moving up
-#define SNEK_CR1_SNEKMOVE_LEFT					6U		// snek is moving left
-#define SNEK_CR1_SNEKMOVE_RIGHT					7U		// snek is moving right
-#define SNEK_CR1_BUTTON_ENTER					8U		// button enter clicked
-#define SNEK_CR1_DRAW_OLED						9U		// refresh screen with new values
-#define SNEK_CR1_ACTIVE_BUTTON_START			10U		// main menu cursor on button start
-#define SNEK_CR1_ACTIVE_BUTTON_SCORES			11U		// main menu cursor on button scores
-#define SNEK_CR1_ACTIVE_BUTTON_SETTINGS			12U		// main menu cursor on button settings
-#define SNEK_CR1_ACTIVE_BUTTON_ABOUT			13U		// main menu cursor on button about
-#define SNEK_CR1_INIT_NEWSCREEN					14U		// information to draw screen once
+#define SNEK_CR1_BUTTON_ENTER					4U		// button enter clicked
+#define SNEK_CR1_DRAW_OLED						8U		// refresh screen with new values
+#define SNEK_CR1_INIT_NEWSCREEN					9U		// information to draw screen once
+
+
+// status register
+#define SNEK_SR1_ACTIVE_BUTTON_START			0U		// main menu cursor on button start
+#define SNEK_SR1_ACTIVE_BUTTON_SCORES			1U		// main menu cursor on button scores
+#define SNEK_SR1_ACTIVE_BUTTON_SETTINGS			2U		// main menu cursor on button settings
+#define SNEK_SR1_ACTIVE_BUTTON_ABOUT			3U		// main menu cursor on button about
+#define SNEK_SR1_SNEKMOVE_DOWN					4U		// snek is moving down
+#define SNEK_SR1_SNEKMOVE_UP					5U		// snek is moving up
+#define SNEK_SR1_SNEKMOVE_LEFT					6U		// snek is moving left
+#define SNEK_SR1_SNEKMOVE_RIGHT					7U		// snek is moving right
+#define SNEK_SR1_ERROR_NODE						8U		// error creating or deleting node
+#define SNEK_SR1_NO_FRUITY						9U		// fruity is required on the map
 
 #define SNEK_BUTTON_DOWN						GPIO_PIN_2
 #define SNEK_BUTTON_UP							GPIO_PIN_14
@@ -54,13 +60,12 @@ typedef enum
 #define SNEK_BUTTON_RIGHT						GPIO_PIN_1
 #define SNEK_BUTTON_ENTER						GPIO_PIN_13
 
-
 #define SNEK_UI_BUTTON_WIDTH					128U
 #define SNEK_UI_BUTTON_HEIGHT					15U
 #define SNEK_UI_BUTTON_OFFSET					16U		// number of pixels from 1 button start to next one
 #define SNEK_UI_CHAR_OFFSET						4U		// number of pixels from button border to char
 
-//we take 48 x 128 game screen and divide it to 8x8 suqares that will be food or snake parts
+//we take 48 x 128 game screen and divide it to 8x8 squares that will be fruity or snek parts
 #define SNEK_UI_GAME_HEIGHT						48U
 #define SNEK_UI_GAME_WIDTH						128U
 #define SNEK_UI_NODE_HEIGHT						8U
@@ -68,18 +73,14 @@ typedef enum
 #define SNEK_UI_NO_NODES						((SNEK_UI_GAME_HEIGHT / SNEK_UI_NODE_HEIGHT) * (SNEK_UI_GAME_WIDTH / SNEK_UI_NODE_WIDTH))
 
 #define SNEK_GAME_HEAD_STARTPOS					8 + (3 * 16)
+#define SNEK_NULL_NODE							100U
+#define SNEK_CHECK_NODE_LIMITS(NODE)			((NODE >= 0U) && (NODE < 96))
 
 // linked list to save snek shape and fruity
 typedef struct node_t
 {
 
 	uint8_t node_taken; // node taken flag
-
-	uint8_t node_x; // y position
-
-	uint8_t node_y; // x position
-
-	uint8_t node_array_pos;  // position in the array x + (y*16)
 
 	uint8_t last_node_pos; // last node position in array
 
@@ -96,6 +97,10 @@ typedef struct snek_game_t
 	menu_buttons_t menu_buttons;
 	// control register 1
 	volatile uint16_t CR1;
+	// status register 1
+	volatile uint16_t SR1;
+	// fruity node
+	uint8_t fruity_node;
 	// game map that will contain snake shape and fruit
 	node_t game_map[SNEK_UI_NO_NODES];
 	// snek first node 'address'
