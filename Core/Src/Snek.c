@@ -321,10 +321,11 @@ static uint8_t snek_map_compute_newposition(snek_game_t *p_snek_game)
 }
 // snek_gamestate - main state machine functions
 
-static void snek_gamestate_init(snek_game_t *p_snek_game)
+static void snek_gamestate_init_menu(snek_game_t *p_snek_game)
 {
 
 	// init cursor
+	SSD1306_Clear(BLACK);
 	p_snek_game->menu_buttons = BUTTON_START;
 	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_START);
 	// set bit to draw menu for the first time
@@ -336,7 +337,7 @@ static void snek_gamestate_init(snek_game_t *p_snek_game)
 
 }
 
-static void snek_gamesate_mainmenu(snek_game_t *p_snek_game)
+static void snek_gamesate_menu(snek_game_t *p_snek_game)
 {
 	// update
 	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED))
@@ -390,7 +391,11 @@ static void snek_gamesate_about(snek_game_t *p_snek_game)
 	// draw about screen
 	SSD1306_Clear(BLACK);
 	snek_ui_draw_mainmenu_button((uint8_t*)"Snek loves fruity", 0, 1);
-	GFX_Image(0, 16, bitmap_snek, 85, 48, YELLOWBLUE);
+	snek_ui_draw_mainmenu_button((uint8_t*)"a lot", 1, 1);
+	GFX_Image(30, 26, gImage_bitmap, 85, 48, YELLOWBLUE);
+	snek_map_drawfruity(p_snek_game, 48);
+	snek_map_drawfruity(p_snek_game, 66);
+	snek_map_drawfruity(p_snek_game, 81);
 	snek_ui_draw_ok_button(ON);
 
 	SSD1306_Display();
@@ -584,11 +589,11 @@ void snek(void)
 	switch (g_snek_game.game_state)
 	{
 	case GAMESTATE_INIT_MENU:
-		snek_gamestate_init(&g_snek_game);
+		snek_gamestate_init_menu(&g_snek_game);
 		break;
 
 	case GAMESTATE_MENU:
-		snek_gamesate_mainmenu(&g_snek_game);
+		snek_gamesate_menu(&g_snek_game);
 		break;
 
 	case GAMESTATE_SCORES:
