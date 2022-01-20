@@ -20,13 +20,13 @@
 
 void SysClockInit(void);
 void GPIOConfig(void);
-void I2C1Config(I2C_Handle_t *phI2C1);
+void i2c1_config(i2c_handle_t *p_handle_i2c1);
 
 volatile uint32_t TickS;
 
 int main()
 {
-	I2C_Handle_t hI2C1;
+	i2c_handle_t h_i2c1;
 
 	SysTick_Config(84000000);
 
@@ -37,8 +37,8 @@ int main()
 	GPIOConfig();
 
 	// Configure I2C peripherals
-	I2C1Config(&hI2C1);
-	SSD1306_Init(&hI2C1);
+	i2c1_config(&h_i2c1);
+	SSD1306_Init(&h_i2c1);
 
 	SSD1306_Clear(SSD1306_COLOR_BLACK);
 	GFX_SetFont(font_8x5);
@@ -163,13 +163,13 @@ void GPIOConfig(void)
 	
 }
 
-void I2C1Config(I2C_Handle_t *phI2C1)
+void i2c1_config(i2c_handle_t *p_handle_i2c1)
 {
 	
 
-	phI2C1->pI2Cx = I2C1;
-	phI2C1->I2CConfig.ABP1FrequencyMHz = 42;
-	phI2C1->I2CConfig.Speed = I2C_SPEED_FAST_DUTY0;
+	p_handle_i2c1->p_i2cx = I2C1;
+	p_handle_i2c1->i2c_config.abp1_freq_mhz = 42;
+	p_handle_i2c1->i2c_config.speed = I2C_SPEED_FAST_DUTY0;
 
-	I2C_Init(phI2C1);
+	i2c_init(p_handle_i2c1);
 }

@@ -11,21 +11,21 @@
 #include "stm32f401xe.h"
 
 // Struct to configure I2C peripheral
+typedef struct i2c_config_t
+{
+	uint8_t abp1_freq_mhz;			// @Frequency of ABP1 [MHz]
+
+	uint8_t speed;						// @Speed
+
+} i2c_config_t;
+
 typedef struct
 {
-	uint8_t ABP1FrequencyMHz;			// @Frequency of ABP1 [MHz]
+	I2C_TypeDef *p_i2cx;		// @GPIOaddress
 
-	uint8_t Speed;						// @Speed
+	i2c_config_t i2c_config;	// @Peripheral config
 
-} I2C_Config_t;
-
-typedef struct
-{
-	I2C_TypeDef *pI2Cx;		// @GPIOaddress
-
-	I2C_Config_t I2CConfig;	// @Peripheral config
-
-} I2C_Handle_t;
+} i2c_handle_t;
 
 
 /*
@@ -45,6 +45,12 @@ typedef struct
 #define I2C_SPEED_SLOW			0U
 #define I2C_SPEED_FAST_DUTY0	1U
 #define I2C_SPEED_FAST_DUTY1	2U
+
+/*
+ * @Mode - mode that is send with address to i2c devices - decides if master is transmitter or reciever
+ */
+#define I2C_MODE_TRANSMITTER	0U
+#define I2C_MODE_RECIEVER		1U
 
 /*
  * @CCR - those are the times in nanoseconds that are defined by I2C characteristics
@@ -80,11 +86,12 @@ typedef struct
 
 
 
+
 /*
  * Errors
  */
 #define I2C_ERROR_WRONG_FREQUENCY 1U
 
-uint8_t I2C_Init(I2C_Handle_t *phI2C);
-uint8_t I2C_Transmit(I2C_Handle_t *phI2C, uint8_t SlaveAddres, uint8_t MemAddress, uint8_t *pDataBuffer,uint32_t DataSize);
+uint8_t i2c_init(i2c_handle_t *p_handle_i2c);
+uint8_t i2c_transmit(i2c_handle_t *p_hi2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_data_buffer,uint32_t data_size);
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */

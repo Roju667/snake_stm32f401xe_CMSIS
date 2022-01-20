@@ -11,13 +11,16 @@
 
 typedef enum
 {
-	GAMESTATE_INIT,
-	GAMESTATE_MENUMAIN,
-	GAMESTATE_MENUSCORES,
-	GAMESTATE_MENUABOUT,
-	GAMESTATE_MENUSETTINGS,
+	GAMESTATE_INIT_MENU,
+	GAMESTATE_MENU,
+	GAMESTATE_SCORES,
+	GAMESTATE_ABOUT,
+	GAMESTATE_SETTINGS,
+	GAMESTATE_INIT_GAME,
 	GAMESTATE_GAME,
-	GAMESTATE_OVER, GAMESTATE_SAVE
+	GAMESTATE_INIT_OVER,
+	GAMESTATE_OVER,
+	GAMESTATE_SAVE
 } game_state_t;
 
 typedef enum
@@ -82,6 +85,9 @@ typedef enum
 #define SNEK_GAME_HEAD_STARTPOS					8 + (3 * 16)
 #define SNEK_NULL_NODE							100U
 #define SNEK_CHECK_NODE_LIMITS(NODE)			((NODE >= 0U) && (NODE < 96))
+
+#define ON										1U
+#define OFF										0U
 
 // linked list to save snek shape and fruity
 typedef struct node_t

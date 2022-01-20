@@ -10,20 +10,20 @@
 #include "SSD1306_OLED.h"
 #include <string.h>
 
-I2C_Handle_t *oled_i2c;
+i2c_handle_t *p_oled_i2c;
 
 static uint8_t buffer [SSD1306_BUFFERSIZE];
 
 
 void SSD1306_Command(uint8_t Command)
 {
-	I2C_Transmit(oled_i2c, SSD1306_ADDRESS, SSD1306_REG_COMMAND, &Command, 1);
+	i2c_transmit(p_oled_i2c, SSD1306_ADDRESS, SSD1306_REG_COMMAND, &Command, 1);
 
 }
 
 void SSD1306_Data(uint8_t *Data, uint16_t Size)
 {
-	I2C_Transmit(oled_i2c, SSD1306_ADDRESS , SSD1306_REG_DATA, Data, Size);
+	i2c_transmit(p_oled_i2c, SSD1306_ADDRESS , SSD1306_REG_DATA, Data, Size);
 
 }
 
@@ -77,9 +77,9 @@ void SSD1306_Display(void)
 
 
 }
-void SSD1306_Init(I2C_Handle_t *i2c)
+void SSD1306_Init(i2c_handle_t *i2c)
 {
-	oled_i2c = i2c;
+	p_oled_i2c = i2c;
 
 	SSD1306_Command(SSD1306_DISPLAYOFF);
 	SSD1306_Command(SSD1306_SETDISPLAYCLOCKDIV);

@@ -73,7 +73,7 @@
   (((a) ^= (b)), ((b) ^= (a)), ((a) ^= (b))) ///< No-temp-var swap operation
 
 
-void SSD1306_Init(I2C_Handle_t *i2c);
+void SSD1306_Init(i2c_handle_t *i2c);
 void SSD1306_Clear(uint8_t Color);
 void SSD1306_Display(void);
 void SSD1306_DrawPixel(int16_t x, int16_t y, uint8_t color);
