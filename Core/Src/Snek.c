@@ -5,7 +5,7 @@
  *      Author: ROJEK
  */
 
-#include "stm32f401xe_GPIO.h"
+#include <stm32f401xe_gpio.h>
 #include "SSD1306_OLED.h"
 #include "GFX_BW.h"
 #include "bitmap.h"

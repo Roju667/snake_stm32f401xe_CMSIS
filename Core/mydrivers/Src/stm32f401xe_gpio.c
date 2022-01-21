@@ -5,8 +5,8 @@
  *      Author: ROJEK
  */
 
-#include "stm32f401xe_GPIO.h"
-#include "stm32f401xe_RCC.h"
+#include "stm32f401xe_gpio.h"
+#include "stm32f401xe_rcc.h"
 
 /*
  * Start clock for GPIO

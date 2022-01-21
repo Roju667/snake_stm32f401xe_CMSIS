@@ -5,9 +5,9 @@
  *      Author: pawel
  */
 
-#include "stm32f401xe_I2C.h"
-#include "stm32f401xe_GPIO.h"
-#include "stm32f401xe_RCC.h"
+#include "stm32f401xe_gpio.h""
+#include "stm32f401xe_i2c.h"
+#include "stm32f401xe_rcc.h"
 
 /*
  * Start clock for GPIO

@@ -35,17 +35,17 @@
  */
 typedef struct RCC_PLLInitTypeDef
 {
-	int8_t PLLState; 	//@PLLState
+	int8_t state; 		//@PLLState
 
-	uint8_t PLLSource;	//@PLLSource
+	uint8_t source;		//@PLLSource
 
-	uint8_t PLLM;		//@PLLM
+	uint8_t pllm;		//@PLLM
 
-	uint16_t PLLN;		//@PLLN
+	uint16_t plln;		//@PLLN
 
-	uint8_t PLLP;		//@PLLP
+	uint8_t pllp;		//@PLLP
 
-	uint8_t PLLQ; 		//@PLLQ
+	uint8_t pllq; 		//@PLLQ
 
 } RCC_PLLInitTypeDef;
 
@@ -55,22 +55,39 @@ typedef struct RCC_PLLInitTypeDef
 typedef struct RCC_ClockInitTypeDef
 {
 
-	uint8_t OscillatorType; //@OscillatorType
+	uint8_t oscillator_type;	 //@OscillatorType
 
-	uint8_t VOSScale;		//@VOSScale
+	uint8_t vos_scale;			//@VOSScale
 
-	uint8_t FLASHLatency;	//@FlashLatency
+	uint8_t flash_latency;		//@FlashLatency
 
-	uint8_t HPREPrescaler;	//@AHB_Prescaler
+	uint8_t hpre_prescaler;		//@AHB_Prescaler
 
-	uint8_t APB1Prescaler; 	//@APB1_Prescaler
+	uint8_t apb1_prescaler; 	//@APB1_Prescaler
 
-	uint8_t APB2Prescaler; //@APB2_Prescaler
+	uint8_t apb2_prescaler; 	//@APB2_Prescaler
 
-	RCC_PLLInitTypeDef PLL;
+	RCC_PLLInitTypeDef pll;
 
 } RCC_ClockInitTypeDef;
 
+// clock frequencies struct
+typedef struct RCC_ClockFreqs
+{
+	uint32_t sysclk;
+
+	uint32_t hclk;
+
+	uint32_t pclk1;
+
+	uint32_t pclk2;
+
+}RCC_ClockFreqs;
+
+#define RCC_HSI_FREQUENCY		16000000U
+#define RCC_HSE_FREQUENCY		0U
+#define RCC_LSI_FREQUENCY		32000U
+#define RCC_LSE_FRQEUENCY		0U
 /*
  HSI/HSE/LSI/LSE
  @OscillatorType
@@ -130,25 +147,19 @@ typedef struct RCC_ClockInitTypeDef
  @APB1_Prescaler
  APB Low speed prescaler (APB1)
  Set and cleared by software to control APB low-speed clock division factor
- */
 
-#define RCC_ABP1_PRESCALER_NODIV	0U
-#define RCC_ABP1_PRESCALER_DIV2		4U
-#define RCC_ABP1_PRESCALER_DIV4		5U
-#define RCC_ABP1_PRESCALER_DIV8		6U
-#define RCC_ABP1_PRESCALER_DIV16	7U
-
-/*
  @APB2_Prescaler
  APB high-speed prescaler (APB2)
  Set and cleared by software to control APB high-speed clock division factor
  */
 
-#define RCC_ABP2_PRESCALER_NODIV	0U
-#define RCC_ABP2_PRESCALER_DIV2		4U
-#define RCC_ABP2_PRESCALER_DIV4		5U
-#define RCC_ABP2_PRESCALER_DIV8		6U
-#define RCC_ABP2_PRESCALER_DIV16	7U
+#define RCC_ABP_PRESCALER_NODIV		0U
+#define RCC_ABP_PRESCALER_DIV2		4U
+#define RCC_ABP_PRESCALER_DIV4		5U
+#define RCC_ABP_PRESCALER_DIV8		6U
+#define RCC_ABP_PRESCALER_DIV16		7U
+
+
 
 /*
  @VOSScale
@@ -208,4 +219,7 @@ typedef struct RCC_ClockInitTypeDef
 
 
 uint8_t RCC_InitClock(RCC_ClockInitTypeDef *pClockInit);
+uint32_t RCC_GetHclk(void);
+uint32_t RCC_GetSysclk(void);
+void RCC_GetClockFrequencies(RCC_ClockFreqs* freqs);
 #endif /* MYDRIVERS_INC_STM32F401XE_RCC_H_ */

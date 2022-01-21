@@ -5,19 +5,22 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/mydrivers/Src/stm32f401xe_GPIO.c \
-../Core/mydrivers/Src/stm32f401xe_I2C.c \
-../Core/mydrivers/Src/stm32f401xe_RCC.c 
+../Core/mydrivers/Src/stm32401xe_tim.c \
+../Core/mydrivers/Src/stm32f401xe_gpio.c \
+../Core/mydrivers/Src/stm32f401xe_i2c.c \
+../Core/mydrivers/Src/stm32f401xe_rcc.c 
 
 OBJS += \
-./Core/mydrivers/Src/stm32f401xe_GPIO.o \
-./Core/mydrivers/Src/stm32f401xe_I2C.o \
-./Core/mydrivers/Src/stm32f401xe_RCC.o 
+./Core/mydrivers/Src/stm32401xe_tim.o \
+./Core/mydrivers/Src/stm32f401xe_gpio.o \
+./Core/mydrivers/Src/stm32f401xe_i2c.o \
+./Core/mydrivers/Src/stm32f401xe_rcc.o 
 
 C_DEPS += \
-./Core/mydrivers/Src/stm32f401xe_GPIO.d \
-./Core/mydrivers/Src/stm32f401xe_I2C.d \
-./Core/mydrivers/Src/stm32f401xe_RCC.d 
+./Core/mydrivers/Src/stm32401xe_tim.d \
+./Core/mydrivers/Src/stm32f401xe_gpio.d \
+./Core/mydrivers/Src/stm32f401xe_i2c.d \
+./Core/mydrivers/Src/stm32f401xe_rcc.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

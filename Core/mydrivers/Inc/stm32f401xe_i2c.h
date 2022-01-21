@@ -15,11 +15,11 @@ typedef struct i2c_config_t
 {
 	uint8_t abp1_freq_mhz;			// @Frequency of ABP1 [MHz]
 
-	uint8_t speed;						// @Speed
+	uint8_t speed;					// @Speed
 
 } i2c_config_t;
 
-typedef struct
+typedef struct i2c_handle_t
 {
 	I2C_TypeDef *p_i2cx;		// @GPIOaddress
 

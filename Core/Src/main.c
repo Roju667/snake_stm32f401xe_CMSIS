@@ -6,10 +6,10 @@
  */
 
 
+#include <stm32f401xe_gpio.h>
+#include <stm32f401xe_i2c.h>
+#include <stm32f401xe_rcc.h>
 #include "stm32f401xe.h"
-#include "stm32f401xe_GPIO.h"
-#include "stm32f401xe_RCC.h"
-#include "stm32f401xe_I2C.h"
 #include "SSD1306_OLED.h"
 #include "GFX_BW.h"
 #include "stdint.h"
@@ -22,7 +22,7 @@ void SysClockInit(void);
 void GPIOConfig(void);
 void i2c1_config(i2c_handle_t *p_handle_i2c1);
 
-volatile uint32_t TickS;
+volatile uint32_t TickS ;
 
 int main()
 {
@@ -33,6 +33,8 @@ int main()
 	// Configure RCC
 	SysClockInit();
 
+	RCC_ClockFreqs freqs = {0};
+	RCC_GetClockFrequencies(&freqs);
 	// Configure GPIO pins
 	GPIOConfig();
 
@@ -117,18 +119,20 @@ void SysClockInit(void)
 {
 	RCC_ClockInitTypeDef pClockInit;
 
-	pClockInit.APB1Prescaler = RCC_ABP1_PRESCALER_DIV2;
-	pClockInit.APB2Prescaler = RCC_ABP2_PRESCALER_NODIV;
-	pClockInit.FLASHLatency = RCC_FLASHLATENCY_2WS;
-	pClockInit.HPREPrescaler = RCC_HPRE_PRESCALER_NODIV;
-	pClockInit.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	pClockInit.VOSScale = RCC_VOS_SCALE2;
-	pClockInit.PLL.PLLSource = RCC_PLL_SOURCE_HSI;
-	pClockInit.PLL.PLLState = RCC_PLL_STATE_ENABLE;
-	pClockInit.PLL.PLLM = 16;
-	pClockInit.PLL.PLLN = 336;
-	pClockInit.PLL.PLLP = RCC_PLLP_DIV4;
-	pClockInit.PLL.PLLQ = 7;
+	pClockInit.apb1_prescaler = RCC_ABP_PRESCALER_DIV2;
+	pClockInit.apb2_prescaler = RCC_ABP_PRESCALER_NODIV;
+	pClockInit.flash_latency = RCC_FLASHLATENCY_2WS;
+	pClockInit.hpre_prescaler = RCC_HPRE_PRESCALER_NODIV;
+	pClockInit.oscillator_type = RCC_OSCILLATORTYPE_HSI;
+	pClockInit.vos_scale = RCC_VOS_SCALE2;
+
+	// init pll
+	pClockInit.pll.source = RCC_PLL_SOURCE_HSI;
+	pClockInit.pll.state = RCC_PLL_STATE_ENABLE;
+	pClockInit.pll.pllm = 16;
+	pClockInit.pll.plln = 336;
+	pClockInit.pll.pllp = RCC_PLLP_DIV4;
+	pClockInit.pll.pllq = 7;
 
 	RCC_InitClock(&pClockInit);
 }
