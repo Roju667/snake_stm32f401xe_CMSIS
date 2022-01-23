@@ -94,4 +94,5 @@ typedef struct i2c_handle_t
 
 uint8_t i2c_init(i2c_handle_t *p_handle_i2c);
 uint8_t i2c_transmit(i2c_handle_t *p_hi2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_data_buffer,uint32_t data_size);
+uint8_t i2c_recieve(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size);
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */

@@ -8,6 +8,8 @@ C_SRCS += \
 ../Core/Src/GFX_BW.c \
 ../Core/Src/SSD1306_OLED.c \
 ../Core/Src/Snek.c \
+../Core/Src/delay.c \
+../Core/Src/eeprom.c \
 ../Core/Src/main.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
@@ -17,6 +19,8 @@ OBJS += \
 ./Core/Src/GFX_BW.o \
 ./Core/Src/SSD1306_OLED.o \
 ./Core/Src/Snek.o \
+./Core/Src/delay.o \
+./Core/Src/eeprom.o \
 ./Core/Src/main.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
@@ -26,6 +30,8 @@ C_DEPS += \
 ./Core/Src/GFX_BW.d \
 ./Core/Src/SSD1306_OLED.d \
 ./Core/Src/Snek.d \
+./Core/Src/delay.d \
+./Core/Src/eeprom.d \
 ./Core/Src/main.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \

@@ -11,14 +11,11 @@
 
 typedef enum
 {
-	GAMESTATE_INIT_MENU,
 	GAMESTATE_MENU,
 	GAMESTATE_SCORES,
 	GAMESTATE_ABOUT,
 	GAMESTATE_SETTINGS,
-	GAMESTATE_INIT_GAME,
 	GAMESTATE_GAME,
-	GAMESTATE_INIT_OVER,
 	GAMESTATE_OVER,
 	GAMESTATE_SAVE
 } game_state_t;
@@ -42,7 +39,6 @@ typedef enum
 #define SNEK_CR1_BUTTON_RIGHT					3U		// button right clicked
 #define SNEK_CR1_BUTTON_ENTER					4U		// button enter clicked
 #define SNEK_CR1_DRAW_OLED						8U		// refresh screen with new values
-#define SNEK_CR1_INIT_NEWSCREEN					9U		// information to draw screen once
 
 
 // status register
@@ -82,10 +78,14 @@ typedef enum
 #define SNEK_UI_OK_BUTTON_WIDTH					20U
 #define SNEK_UI_OK_BUTTON_HEIGHT				11U
 
-#define SNEK_GAME_HEAD_STARTPOS					8 + (3 * 16)
+#define SNEK_GAME_HEAD_STARTPOS					8U + (3U * 16U)
+#define SNEK_GAME_START_LENGHT					3U
 #define SNEK_NULL_NODE							100U
 #define SNEK_CHECK_NODE_LIMITS(NODE)			((NODE >= 0U) && (NODE < 96))
+#define SCREEN_ACTIVE							1U
 
+
+#define EEPROM_SIZE								128U
 #define ON										1U
 #define OFF										0U
 

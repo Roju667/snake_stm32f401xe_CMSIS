@@ -17,13 +17,13 @@ static uint8_t buffer [SSD1306_BUFFERSIZE];
 
 void SSD1306_Command(uint8_t Command)
 {
-	i2c_transmit(p_oled_i2c, SSD1306_ADDRESS, SSD1306_REG_COMMAND, &Command, 1);
+	i2c_transmit(p_oled_i2c, (SSD1306_ADDRESS << 1), SSD1306_REG_COMMAND, &Command, 1);
 
 }
 
 void SSD1306_Data(uint8_t *Data, uint16_t Size)
 {
-	i2c_transmit(p_oled_i2c, SSD1306_ADDRESS , SSD1306_REG_DATA, Data, Size);
+	i2c_transmit(p_oled_i2c, (SSD1306_ADDRESS << 1), SSD1306_REG_DATA, Data, Size);
 
 }
 

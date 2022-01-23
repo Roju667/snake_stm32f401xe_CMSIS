@@ -17,6 +17,7 @@
 #include "stddef.h"
 #include "stdio.h"
 #include "Snek.h"
+#include "eeprom.h"
 
 void SysClockInit(void);
 void GPIOConfig(void);
@@ -28,7 +29,6 @@ int main()
 {
 	i2c_handle_t h_i2c1;
 
-	SysTick_Config(84000000);
 
 	// Configure RCC
 	SysClockInit();
@@ -41,14 +41,8 @@ int main()
 	// Configure I2C peripherals
 	i2c1_config(&h_i2c1);
 	SSD1306_Init(&h_i2c1);
-
-	SSD1306_Clear(SSD1306_COLOR_BLACK);
+	Eeprom_Init(&h_i2c1);
 	GFX_SetFont(font_8x5);
-
-	SSD1306_Display();
-
-
-
 
 	while(1)
 	{

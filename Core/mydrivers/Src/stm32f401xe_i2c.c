@@ -218,31 +218,28 @@ uint8_t i2c_init(i2c_handle_t *p_handle_i2c)
  * @param[mode] - send information if master is in reciever or transmitter mode @Mode
  * @return - void
  */
-static void i2c_send_address(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mode)
+static void i2c_send_address(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mode, uint32_t timeout)
 {
 	uint8_t temp_byte;
+	uint32_t temp_timeout = 0;
 	//1.0 Set START BIT
 	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_ACK;
 	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_START;
 
 	//1.1 Wait until SB flag is set
 	while (!(I2C_SR1_SB & p_handle_i2c->p_i2cx->SR1))
+		if (temp_timeout > timeout)
+			break;
 		;
 	//1.2 Clear SB by reading SR1
 	temp_byte = p_handle_i2c->p_i2cx->SR1;
-	//2. Put slave address in DR register -
-	p_handle_i2c->p_i2cx->DR = (slave_address << 1);
 	// If transmitting set slave addres LSB to 0, reciever 1
-	p_handle_i2c->p_i2cx->DR &= ~(1U);
-	p_handle_i2c->p_i2cx->DR |= mode;
-	//3. ADDR bit set by hardware
+	slave_address &= (~1U);
+	slave_address |= mode;
+	//2. Put slave address in DR register -
+	p_handle_i2c->p_i2cx->DR = slave_address;
 
-	// wait until ADDR is set
-	while (!(I2C_SR1_ADDR & p_handle_i2c->p_i2cx->SR1))
-		;
-	//4. ADDR is cleared by reading SR1 , Read SR2
-	temp_byte = p_handle_i2c->p_i2cx->SR1;
-	temp_byte = p_handle_i2c->p_i2cx->SR2;
+
 }
 
 /*
@@ -260,8 +257,16 @@ uint8_t i2c_transmit(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t 
 
 	uint32_t tx_data_to_send = data_size;
 	uint32_t tx_data_index = 0;
+	uint8_t temp_byte;
 
-	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_TRANSMITTER);
+	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_TRANSMITTER, 400000);
+
+	// wait until ADDR is set
+	while (!(I2C_SR1_ADDR & p_handle_i2c->p_i2cx->SR1))
+		;
+	//4. ADDR is cleared by reading SR1 , Read SR2
+	temp_byte = p_handle_i2c->p_i2cx->SR1;
+	temp_byte = p_handle_i2c->p_i2cx->SR2;
 
 //5. TxE bit is set when acknowledge bit is sent
 	while (!(p_handle_i2c->p_i2cx->SR1 & I2C_SR1_TXE))
@@ -299,8 +304,74 @@ uint8_t i2c_transmit(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t 
 	return 0;
 }
 
-uint8_t i2c_recieve(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_rx_data_buffer, uint32_t data_size)
+uint8_t i2c_recieve(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size)
 {
-	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_RECIEVER);
+
+	uint32_t rx_data_to_get = data_size;
+	uint8_t temp_byte;
+	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_ACK;
+	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_RECIEVER, 400000);
+
+	while (!(I2C_SR1_ADDR & p_handle_i2c->p_i2cx->SR1))
+		;
+
+	// single byte recieve
+	if (data_size == 1)
+	{
+		// Disable acknowledge
+		p_handle_i2c->p_i2cx->CR1 &= ~(I2C_CR1_ACK);
+		//4. ADDR is cleared by reading SR1 , Read SR2
+		temp_byte = p_handle_i2c->p_i2cx->SR1;
+		temp_byte = p_handle_i2c->p_i2cx->SR2;
+
+		// stop comm
+		p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_STOP;
+
+		// wait for a byte recieved
+		while (!(I2C_SR1_RXNE & p_handle_i2c->p_i2cx->SR1))
+			;
+
+		p_rx_data_buffer[data_size - rx_data_to_get] = p_handle_i2c->p_i2cx->DR;
+
+		return 0;
+	}
+
+	// multiple bytes recieve
+	while (rx_data_to_get > 2)
+	{
+
+		//4. ADDR is cleared by reading SR1 , Read SR2
+		temp_byte = p_handle_i2c->p_i2cx->SR1;
+		temp_byte = p_handle_i2c->p_i2cx->SR2;
+
+		// read all the bytes until second last
+		while (rx_data_to_get > 2)
+		{
+			while (!(I2C_SR1_RXNE & p_handle_i2c->p_i2cx->SR1))
+				;
+			p_rx_data_buffer[data_size - rx_data_to_get] = p_handle_i2c->p_i2cx->DR;
+			rx_data_to_get--;
+
+			// ack recieve
+			p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_ACK;
+		}
+
+		// read second last byte
+		while (!(I2C_SR1_RXNE & p_handle_i2c->p_i2cx->SR1))
+			;
+		p_rx_data_buffer[data_size - rx_data_to_get] = p_handle_i2c->p_i2cx->DR;
+		rx_data_to_get--;
+
+		// after second last byte clear ACK and set stop
+		p_handle_i2c->p_i2cx->CR1 &= ~(I2C_CR1_ACK);
+		p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_STOP;
+
+		// recieve last byte
+		while (!(I2C_SR1_RXNE & p_handle_i2c->p_i2cx->SR1))
+			;
+		p_rx_data_buffer[data_size - rx_data_to_get] = p_handle_i2c->p_i2cx->DR;
+		rx_data_to_get--;
+
+	}
 	return 0;
 }

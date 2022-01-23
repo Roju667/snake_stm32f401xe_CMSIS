@@ -1,6 +1,8 @@
 "./Core/Src/GFX_BW.o"
 "./Core/Src/SSD1306_OLED.o"
 "./Core/Src/Snek.o"
+"./Core/Src/delay.o"
+"./Core/Src/eeprom.o"
 "./Core/Src/main.o"
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
