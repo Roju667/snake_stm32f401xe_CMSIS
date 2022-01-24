@@ -24,7 +24,7 @@ void Eeprom_SendData(uint8_t first_page, uint8_t *data_buffer, uint32_t data_siz
 	// save data in eeprom pages
 	for (uint8_t transmit_count = 0; transmit_count < write_pages; transmit_count++)
 	{
-		i2c_transmit(p_eeprom_i2c, (EEPROM_CONTORLBYTE << 1), (first_page + transmit_count) * EEPROM_PAGE_SIZE,
+		i2c_transmit(p_eeprom_i2c, (EEPROM_CONTORLBYTE << 1), first_page + (transmit_count * EEPROM_PAGE_SIZE),
 				&(data_buffer[transmit_count * EEPROM_PAGE_SIZE]),
 				EEPROM_PAGE_SIZE);
 
@@ -39,7 +39,7 @@ void Eeprom_ReadData(uint8_t first_page, uint8_t *data_buffer, uint32_t data_siz
 {
 
 	// transmit info that we are reading
-	i2c_transmit(p_eeprom_i2c, (EEPROM_CONTORLBYTE << 1), 0, 0, 0);
+	i2c_transmit(p_eeprom_i2c, (EEPROM_CONTORLBYTE << 1),first_page,0,0);
 	i2c_recieve(p_eeprom_i2c, (EEPROM_CONTORLBYTE << 1), data_buffer, data_size);
 
 }

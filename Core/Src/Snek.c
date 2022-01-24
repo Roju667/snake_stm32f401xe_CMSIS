@@ -20,6 +20,12 @@
 snek_game_t g_snek_game;
 
 //  snek_ui - functions used to draw user interface
+static void snek_ui_modify_speed(snek_game_t *p_snek_game)
+{
+	p_snek_game->p_game_tick_tim = TIM9;
+	p_snek_game->p_game_tick_tim->ARR = 9999 - (p_snek_game->game_config.speed * 1000);
+	p_snek_game->p_game_tick_tim->CNT = 0;
+}
 
 static void snek_ui_draw_mainmenu_button(uint8_t *p_text, uint8_t pos, uint8_t select)
 {
@@ -79,6 +85,58 @@ static void snek_ui_gameover_animation(void)
 	}
 }
 
+static void snek_eeprom_erase(void)
+{
+	uint8_t temp_data[EEPROM_SIZE] = {'0'};
+	uint8_t dummy[8] =
+			{ 'd', 'u', 'm', 'm', 'y', '0', '0', '0' };
+
+	//create 10 dummy names
+	for (uint8_t i = 0; i < 10; i++)
+	{
+		//fill names
+		dummy[7] = i + 48;
+		memcpy(&temp_data[i * EEPROM_PAGE_SIZE], dummy, 8);
+
+		//fill scores
+		temp_data[EEPROM_PAGE_SIZE * 10 + i] = 10 - i;
+	}
+
+	// earse game configuration to 0
+	temp_data[96] = 0; // speed
+	temp_data[97] = 0; // color
+
+	Eeprom_SendData(0, temp_data, EEPROM_SIZE);
+
+	delay(5000);
+
+	Eeprom_ReadData(0, temp_data, EEPROM_SIZE);
+
+}
+
+static void snek_eeprom_getconfig(snek_game_t *p_snek_game)
+{
+	uint8_t temp_array[8] = {0};
+	Eeprom_ReadData(96, temp_array, 8);
+
+	p_snek_game->game_config.speed = temp_array[0];
+	p_snek_game->game_config.color = temp_array[1];
+
+	return;
+}
+
+static void snek_eeprom_setconfig(snek_game_t *p_snek_game)
+{
+	uint8_t temp_array[8];
+
+	temp_array[0] = p_snek_game->game_config.speed;
+	temp_array[1] = p_snek_game->game_config.color;
+
+	Eeprom_SendData(96, temp_array, 8);
+
+	return;
+}
+
 static uint8_t snek_ui_mainmenu_check_update(snek_game_t *p_snek_game)
 {
 	// check if button down is clicked
@@ -103,21 +161,21 @@ static uint8_t snek_ui_mainmenu_check_update(snek_game_t *p_snek_game)
 	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER))
 	{
 		// change menu screen
-		if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_START))
+		if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0))
 		{
 			p_snek_game->game_state = GAMESTATE_GAME;
 		}
-		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_SCORES))
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_1))
 		{
 			p_snek_game->game_state = GAMESTATE_SCORES;
 		}
-		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_ABOUT))
-		{
-			p_snek_game->game_state = GAMESTATE_ABOUT;
-		}
-		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_SETTINGS))
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_2))
 		{
 			p_snek_game->game_state = GAMESTATE_SETTINGS;
+		}
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_3))
+		{
+			p_snek_game->game_state = GAMESTATE_ABOUT;
 		}
 
 		//debounce delay
@@ -131,6 +189,86 @@ static uint8_t snek_ui_mainmenu_check_update(snek_game_t *p_snek_game)
 	return 0;
 }
 
+static uint8_t snek_ui_settingsmenu_check_update(snek_game_t *p_snek_game)
+{
+	// check if button down is clicked
+	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_DOWN))
+	{
+		// move button cursor down
+		p_snek_game->menu_buttons = (p_snek_game->menu_buttons + 1) % 4;
+		SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
+		SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_DOWN);
+	}
+
+	// check if button up is clicked
+	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_UP))
+	{
+		// move button up
+		p_snek_game->menu_buttons = (p_snek_game->menu_buttons + 3) % 4;
+		SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
+		SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_UP);
+	}
+
+	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_LEFT))
+	{
+		// switch setting
+		if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0))
+		{
+			p_snek_game->game_config.speed = (p_snek_game->game_config.speed + 9) % 10;
+		}
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_1))
+		{
+			p_snek_game->game_config.color ^= 0x01;
+		}
+
+		SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
+		SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_LEFT);
+	}
+
+	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_RIGHT))
+	{
+		// switch setting
+		if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0))
+		{
+			p_snek_game->game_config.speed = (p_snek_game->game_config.speed + 1) % 10;
+		}
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_1))
+		{
+			p_snek_game->game_config.color ^= 0x01;
+		}
+
+		SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
+		SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_RIGHT);
+	}
+
+	// check if enter is clicked
+	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER))
+	{
+		// change menu screen
+		if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_2))
+		{
+			//erase eeprom
+			snek_eeprom_erase();
+			snek_eeprom_getconfig(p_snek_game);
+		}
+		else if (SNEK_CHECK_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_3))
+		{
+			//go back
+			p_snek_game->game_state = GAMESTATE_MENU;
+			snek_eeprom_setconfig(p_snek_game);
+
+		}
+
+		//debounce delay
+		delay(840000);
+		SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER);
+
+		return 1;
+
+	}
+
+	return 0;
+}
 // snek_map - functions used during game to draw move snek, update fruity positions etc.
 
 static void snek_map_clearmap(snek_game_t *p_snek_game)
@@ -320,35 +458,15 @@ static uint8_t snek_map_compute_newposition(snek_game_t *p_snek_game)
 }
 // snek_gamestate - main state machine functions
 
-static void snek_eeprom_erase(void)
-{
-	uint8_t temp_data[EEPROM_PAGE_SIZE * 12];
-	uint8_t dummy[8] =
-	{ 'd', 'u', 'm', 'm', 'y', '0', '0', '0' };
-
-	//create 10 dummy names
-	for (uint8_t i = 0; i < 10; i++)
-	{
-		//fill names
-		dummy[7] = i + 48;
-		memcpy(&temp_data[i * EEPROM_PAGE_SIZE], dummy, 8);
-
-		//fill scores
-		temp_data[EEPROM_PAGE_SIZE * 10 + i] = 10 - i;
-	}
-
-	Eeprom_SendData(0, temp_data, EEPROM_PAGE_SIZE * 12);
-
-}
-
 static void snek_gamestate_menu(snek_game_t *p_snek_game)
 {
 
 	// *** INIT SCREEN *** //
 	SSD1306_Clear(BLACK);
-	p_snek_game->menu_buttons = BUTTON_START;
-	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_START);
+	p_snek_game->menu_buttons = BUTTON_0_START_SPEED;
+	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0);
 	// set bit to draw menu for the first time
+	snek_eeprom_getconfig(p_snek_game);
 	SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
 	SNEK_RESET_BIT(p_snek_game->SR1, SNEK_SR1_ERROR_NODE);
 
@@ -364,30 +482,30 @@ static void snek_gamestate_menu(snek_game_t *p_snek_game)
 			snek_ui_draw_mainmenu_button((uint8_t*) "Settings", 2, 0);
 			snek_ui_draw_mainmenu_button((uint8_t*) "About", 3, 0);
 			// clear active buttons bits
-			p_snek_game->SR1 &= ~(15U << SNEK_SR1_ACTIVE_BUTTON_START);
+			p_snek_game->SR1 &= ~(15U << SNEK_SR1_ACTIVE_BUTTON_0);
 
 			//draw selected button
 			//set active window bit
 			switch (p_snek_game->menu_buttons)
 			{
-			case (BUTTON_START):
+			case (BUTTON_0_START_SPEED):
 				snek_ui_draw_mainmenu_button((uint8_t*) "Start", 0, 1);
-				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_START);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0);
 				break;
 
-			case (BUTTON_SCORES):
+			case (BUTTON_1_SCORES_COLOR):
 				snek_ui_draw_mainmenu_button((uint8_t*) "High scores", 1, 1);
-				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_SCORES);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_1);
 				break;
 
-			case (BUTTON_SETTINGS):
+			case (BUTTON_2_SETTINGS_ERASE):
 				snek_ui_draw_mainmenu_button((uint8_t*) "Settings", 2, 1);
-				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_SETTINGS);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_2);
 				break;
 
-			case (BUTTON_ABOUT):
+			case (BUTTON_3_ABOUT_OK):
 				snek_ui_draw_mainmenu_button((uint8_t*) "About", 3, 1);
-				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_ABOUT);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_3);
 				break;
 			}
 
@@ -432,31 +550,65 @@ static void snek_gamestate_settings(snek_game_t *p_snek_game)
 {
 	// *** INIT SCREEN *** //
 	SSD1306_Clear(BLACK);
-
 	SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER);
-
-	snek_ui_draw_mainmenu_button((uint8_t*) "xxxx", 0, 0);
-	snek_ui_draw_mainmenu_button((uint8_t*) "xxxx", 1, 0);
-	snek_ui_draw_mainmenu_button((uint8_t*) "xxxx", 2, 0);
-	snek_ui_draw_mainmenu_button((uint8_t*) "xxxx", 3, 0);
-
-	snek_ui_draw_ok_button(OFF);
-
-	SSD1306_Display();
+	snek_eeprom_getconfig(p_snek_game);
+	p_snek_game->menu_buttons = BUTTON_0_START_SPEED;
+	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0);
+	SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
 
 	// *** ACTIVE SCREEN *** //
+
 	while (SCREEN_ACTIVE)
 	{
-
-		if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER))
+		// update
+		if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED))
 		{
-			snek_eeprom_erase();
-			delay(840000);
-			p_snek_game->game_state = GAMESTATE_MENU;
-			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER);
-			return;
+
+			uint8_t text[16];
+			sprintf((char*) text, "Speed <%d>", p_snek_game->game_config.speed);
+			snek_ui_draw_mainmenu_button((uint8_t*) text, 0, 0);
+			sprintf((char*) text, "Color <%d>", p_snek_game->game_config.color);
+			snek_ui_draw_mainmenu_button((uint8_t*) text, 1, 0);
+			snek_ui_draw_mainmenu_button((uint8_t*) "Erase scores", 2, 0);
+			snek_ui_draw_ok_button(OFF);
+			// clear active buttons bits
+			p_snek_game->SR1 &= ~(15U << SNEK_SR1_ACTIVE_BUTTON_0);
+
+			//draw selected button
+			//set active window bit
+			switch (p_snek_game->menu_buttons)
+			{
+			case (BUTTON_0_START_SPEED):
+				sprintf((char*) text, "Speed <%d>", p_snek_game->game_config.speed);
+				snek_ui_draw_mainmenu_button((uint8_t*) text, 0, 1);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_0);
+				break;
+
+			case (BUTTON_1_SCORES_COLOR):
+				sprintf((char*) text, "Color <%d>", p_snek_game->game_config.color);
+				snek_ui_draw_mainmenu_button((uint8_t*) text, 1, 1);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_1);
+				break;
+
+			case (BUTTON_2_SETTINGS_ERASE):
+				snek_ui_draw_mainmenu_button((uint8_t*) "Erase scores", 2, 1);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_2);
+				break;
+
+			case (BUTTON_3_ABOUT_OK):
+				snek_ui_draw_ok_button(ON);
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_ACTIVE_BUTTON_3);
+				break;
+			}
+
+			// sent data to OLED
+			SSD1306_Display();
+			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
 		}
 
+		// check for new update
+		if (snek_ui_settingsmenu_check_update(p_snek_game) == 1)
+			return;
 	}
 }
 
@@ -465,7 +617,7 @@ static void snek_gamestate_scores(snek_game_t *p_snek_game)
 	// *** INIT SCREEN *** //
 	static uint8_t temp_array[128];
 	uint8_t temp_name[16] =
-	{ 0 };
+			{ 0 };
 	uint8_t temp_score;
 	uint8_t display_text[24];
 	uint8_t offset = 0;
@@ -522,6 +674,9 @@ static void snek_gamestate_game(snek_game_t *p_snek_game)
 	p_snek_game->snek_lenght = 0;
 	snek_map_clearmap(p_snek_game);
 	SSD1306_Clear(BLACK);
+
+	// set speed
+	snek_ui_modify_speed(p_snek_game);
 	// draw scorebox as a top button
 	GFX_DrawRectangle(0, 0, SNEK_UI_BUTTON_WIDTH, SNEK_UI_BUTTON_HEIGHT, YELLOWBLUE);
 	GFX_DrawString(5, 0 + SNEK_UI_CHAR_OFFSET, "SNEK", YELLOWBLUE, BLACK);
@@ -535,55 +690,54 @@ static void snek_gamestate_game(snek_game_t *p_snek_game)
 	// set first movement as right
 	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_SNEKMOVE_RIGHT);
 	SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_NO_FRUITY);
+	SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_GAME_TICK);
 
 	SSD1306_Display();
 
 	while (SCREEN_ACTIVE)
 
 	{
-	SNEK_SET_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED);
-
-	// game tick
-	if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_DRAW_OLED))
-	{
-		// check if direction change is required
-		snek_map_check_direction(p_snek_game);
-
-		// check if new fruity is required
-		snek_map_check_fruity(p_snek_game);
-
-		delay(840000);
-
-		// calculate next node position in array
-		uint8_t temp_new_head = snek_map_compute_newposition(p_snek_game);
-
-		// check if new node is taken -> if yes then collision
-		if (p_snek_game->game_map[temp_new_head].node_taken)
+		// game tick
+		if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_GAME_TICK))
 		{
-			p_snek_game->game_state = GAMESTATE_OVER;
-			return;
+			// check if direction change is required
+			snek_map_check_direction(p_snek_game);
+
+			// check if new fruity is required
+			snek_map_check_fruity(p_snek_game);
+
+			// calculate next node position in array
+			uint8_t temp_new_head = snek_map_compute_newposition(p_snek_game);
+
+			// check if new node is taken -> if yes then collision
+			if (p_snek_game->game_map[temp_new_head].node_taken)
+			{
+				p_snek_game->game_state = GAMESTATE_OVER;
+				return;
+			}
+
+			// check if next node is fruity node
+			if (p_snek_game->fruity_node == temp_new_head)
+			{
+				SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_NO_FRUITY);
+
+			}
+			else
+			{
+				// erase tail
+				snek_map_erasenode(p_snek_game, p_snek_game->tail_address);
+			}
+
+			// draw new head
+			snek_map_drawnode(p_snek_game, temp_new_head);
+
+			snek_ui_updatescore(p_snek_game);
+
+			SSD1306_Display();
+
+			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_GAME_TICK);
 		}
-
-		// check if next node is fruity node
-		if (p_snek_game->fruity_node == temp_new_head)
-		{
-			SNEK_SET_BIT(p_snek_game->SR1, SNEK_SR1_NO_FRUITY);
-
-		}
-		else
-		{
-			// erase tail
-			snek_map_erasenode(p_snek_game, p_snek_game->tail_address);
-		}
-
-		// draw new head
-		snek_map_drawnode(p_snek_game, temp_new_head);
-
-		snek_ui_updatescore(p_snek_game);
-
-		SSD1306_Display();
 	}
-}
 
 }
 
@@ -594,7 +748,7 @@ static void snek_gamestate_over(snek_game_t *p_snek_game)
 	snek_ui_gameover_animation();
 
 	uint8_t msg[16];
-	sprintf((char*) msg, "Score: %d", (p_snek_game->snek_lenght - 3));
+	sprintf((char*) msg, "Score: %d", (p_snek_game->snek_lenght - SNEK_GAME_START_LENGHT + p_snek_game->game_config.speed));
 
 	// draw buttons
 	snek_ui_draw_mainmenu_button((uint8_t*) "Game over", 0, 1);
@@ -684,10 +838,10 @@ static void snek_gamestate_over(snek_game_t *p_snek_game)
 static void snek_gamestate_save(snek_game_t *p_snek_game)
 {
 	uint8_t save_name[SNEK_UI_MAX_NAME_LENGHT] =
-	{ 0 };
-	uint8_t save_score = p_snek_game->snek_lenght - SNEK_GAME_START_LENGHT;
+			{ 0 };
+	uint8_t save_score = p_snek_game->snek_lenght - SNEK_GAME_START_LENGHT + p_snek_game->game_config.speed;
 	uint8_t new_position = 99;
-	static uint8_t temp_buffer[EEPROM_SIZE];
+	static uint8_t temp_buffer[EEPROM_SCORES_SIZE];
 
 	// fill name
 	for (uint8_t arr_count = 0; arr_count < SNEK_UI_MAX_NAME_LENGHT; arr_count++)
@@ -805,4 +959,11 @@ void snek_button_callback(uint8_t GPIO_Pin)
 		break;
 	}
 
+}
+
+// gametick callback
+
+void snek_gametick_callback(void)
+{
+	SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_GAME_TICK);
 }

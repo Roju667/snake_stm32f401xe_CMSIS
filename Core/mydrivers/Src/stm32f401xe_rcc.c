@@ -5,7 +5,7 @@
  *      Author: ROJEK
  */
 
-#include "stm32f401xe_rcc.h""
+#include "stm32f401xe_rcc.h"
 
 /*
  * Configure clock
