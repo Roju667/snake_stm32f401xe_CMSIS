@@ -156,11 +156,12 @@ typedef struct snek_game_t
 
 	TIM_TypeDef *p_game_tick_tim;		// game tick timer
 
+
 } snek_game_t;
 
 
-void snek(void);
-void snek_button_callback(uint8_t GPIO_Pin);
-void snek_gametick_callback(void);
+void snek(snek_game_t *snek_game);
+void snek_button_callback(uint8_t GPIO_Pin, snek_game_t *snek_game);
+void snek_gametick_callback(snek_game_t *snek_game);
 
 #endif /* INC_SNEK_H_ */

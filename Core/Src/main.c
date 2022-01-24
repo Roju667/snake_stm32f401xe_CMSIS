@@ -25,13 +25,12 @@ void SysClockInit(void);
 void GPIOConfig(void);
 void TIM9Config(TimerHandle_t *p_handle_tim);
 void i2c1_config(i2c_handle_t *p_handle_i2c1);
-
+snek_game_t snek_game;
 
 int main()
 {
 	i2c_handle_t h_i2c1;
 	TimerHandle_t h_tim9;
-
 
 	// Configure RCC
 	SysClockInit();
@@ -54,7 +53,7 @@ int main()
 
 	while(1)
 	{
-		snek();
+		snek(&snek_game);
 	}
 }
 
@@ -69,7 +68,7 @@ void EXTI1_IRQHandler(void)
 		temp_gpio_pin = SNEK_BUTTON_RIGHT;
 	}
 
-	snek_button_callback(temp_gpio_pin);
+	snek_button_callback(temp_gpio_pin, &snek_game);
 }
 
 // handler for button DOWN
@@ -83,7 +82,7 @@ void EXTI2_IRQHandler(void)
 		temp_gpio_pin = SNEK_BUTTON_DOWN;
 	}
 
-	snek_button_callback(temp_gpio_pin);
+	snek_button_callback(temp_gpio_pin, &snek_game);
 }
 
 // handler for buttons up/left/enter
@@ -108,13 +107,13 @@ void EXTI15_10_IRQHandler(void)
 		temp_gpio_pin = SNEK_BUTTON_ENTER;
 	}
 
-	snek_button_callback(temp_gpio_pin);
+	snek_button_callback(temp_gpio_pin, &snek_game);
 }
 
 // game tick
 void TIM1_BRK_TIM9_IRQHandler(void)
 {
-	snek_gametick_callback();
+	snek_gametick_callback(&snek_game);
 	TIM_ClearUpdateFlag(TIM9);
 }
 

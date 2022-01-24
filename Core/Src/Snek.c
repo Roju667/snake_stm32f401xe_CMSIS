@@ -17,8 +17,6 @@
 #include "stdio.h"
 #include "Snek.h"
 
-snek_game_t g_snek_game;
-
 //  snek_ui - functions used to draw user interface
 static void snek_ui_modify_speed(snek_game_t *p_snek_game)
 {
@@ -761,8 +759,8 @@ static void snek_gamestate_over(snek_game_t *p_snek_game)
 
 	// init text editor values
 	p_snek_game->txt_edit.pos = 0;
+	memset(p_snek_game->txt_edit.name, ' ', 8);
 	p_snek_game->txt_edit.val = 'A';
-	memset(p_snek_game->txt_edit.name, ' ', 16);
 
 	SSD1306_Display();
 
@@ -776,13 +774,29 @@ static void snek_gamestate_over(snek_game_t *p_snek_game)
 		{
 			delay(840000);
 			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_UP);
-			(p_snek_game->txt_edit.val >= 'Z') ? p_snek_game->txt_edit.val = 'A' : p_snek_game->txt_edit.val++;
+
+			if (p_snek_game->txt_edit.val >= 'Z' || p_snek_game->txt_edit.val < 'A')
+			{
+				p_snek_game->txt_edit.val = 'A';
+			}
+			else
+			{
+				p_snek_game->txt_edit.val++;
+			}
 		}
 		else if (SNEK_CHECK_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_DOWN))
 		{
 			delay(840000);
 			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_DOWN);
-			(p_snek_game->txt_edit.val <= 'A') ? p_snek_game->txt_edit.val = 'Z' : p_snek_game->txt_edit.val--;
+
+			if (p_snek_game->txt_edit.val > 'Z' || p_snek_game->txt_edit.val <= 'A')
+			{
+				p_snek_game->txt_edit.val = 'Z';
+			}
+			else
+			{
+				p_snek_game->txt_edit.val--;
+			}
 		}
 
 		// check if there is position to change
@@ -801,14 +815,15 @@ static void snek_gamestate_over(snek_game_t *p_snek_game)
 			p_snek_game->txt_edit.val = p_snek_game->txt_edit.name[p_snek_game->txt_edit.pos];
 		}
 
+		GFX_DrawLine(40, 61, 48 + 45, 61, BLACK);
 		// jump between letters
 		if (p_snek_game->txt_edit.pos != SNEK_UI_MAX_NAME_LENGHT)
 		{
-
+			GFX_DrawLine((p_snek_game->txt_edit.pos * 6) + 40, 61, (p_snek_game->txt_edit.pos * 6) + 45, 61, YELLOWBLUE);
 			GFX_DrawChar((p_snek_game->txt_edit.pos * 6) + SNEK_UI_TXT_EDITOR_OFFSET_LEFT, SSD1306_LCDHEIGHT - SNEK_UI_TXT_EDITOR_OFFSET_BOTTOM,
 					p_snek_game->txt_edit.val, YELLOWBLUE,
 					BLACK);
-
+			SNEK_RESET_BIT(p_snek_game->CR1, SNEK_CR1_BUTTON_ENTER);
 			snek_ui_draw_ok_button(OFF);
 		}
 		else
@@ -851,7 +866,7 @@ static void snek_gamestate_save(snek_game_t *p_snek_game)
 
 	// read scores from eeprom
 
-	Eeprom_ReadData(0, temp_buffer, EEPROM_SIZE);
+	Eeprom_ReadData(0, temp_buffer, EEPROM_SCORES_SIZE);
 	// check if score is qualifying to top
 	for (uint8_t i = 0; i < 10; i++)
 	{
@@ -892,37 +907,37 @@ static void snek_gamestate_save(snek_game_t *p_snek_game)
 
 // main function
 
-void snek(void)
+void snek(snek_game_t *snek_game)
 {
-	switch (g_snek_game.game_state)
+	switch (snek_game->game_state)
 	{
 
 	case GAMESTATE_MENU:
-		snek_gamestate_menu(&g_snek_game);
+		snek_gamestate_menu(snek_game);
 		break;
 
 	case GAMESTATE_SCORES:
-		snek_gamestate_scores(&g_snek_game);
+		snek_gamestate_scores(snek_game);
 		break;
 
 	case GAMESTATE_ABOUT:
-		snek_gamestate_about(&g_snek_game);
+		snek_gamestate_about(snek_game);
 		break;
 
 	case GAMESTATE_SETTINGS:
-		snek_gamestate_settings(&g_snek_game);
+		snek_gamestate_settings(snek_game);
 		break;
 
 	case GAMESTATE_GAME:
-		snek_gamestate_game(&g_snek_game);
+		snek_gamestate_game(snek_game);
 		break;
 
 	case GAMESTATE_OVER:
-		snek_gamestate_over(&g_snek_game);
+		snek_gamestate_over(snek_game);
 		break;
 
 	case GAMESTATE_SAVE:
-		snek_gamestate_save(&g_snek_game);
+		snek_gamestate_save(snek_game);
 		break;
 
 	default:
@@ -932,30 +947,30 @@ void snek(void)
 
 // callback to connect hardware buttons with snek game
 
-void snek_button_callback(uint8_t GPIO_Pin)
+void snek_button_callback(uint8_t GPIO_Pin, snek_game_t *snek_game)
 {
 
 // set button clicked bit in CR1
 	switch (GPIO_Pin)
 	{
 	case SNEK_BUTTON_DOWN:
-		SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_BUTTON_DOWN);
+		SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_BUTTON_DOWN);
 		break;
 
 	case SNEK_BUTTON_UP:
-		SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_BUTTON_UP);
+		SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_BUTTON_UP);
 		break;
 
 	case SNEK_BUTTON_LEFT:
-		SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_BUTTON_LEFT);
+		SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_BUTTON_LEFT);
 		break;
 
 	case SNEK_BUTTON_RIGHT:
-		SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_BUTTON_RIGHT);
+		SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_BUTTON_RIGHT);
 		break;
 
 	case SNEK_BUTTON_ENTER:
-		SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_BUTTON_ENTER);
+		SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_BUTTON_ENTER);
 		break;
 	}
 
@@ -963,7 +978,7 @@ void snek_button_callback(uint8_t GPIO_Pin)
 
 // gametick callback
 
-void snek_gametick_callback(void)
+void snek_gametick_callback(snek_game_t *snek_game)
 {
-	SNEK_SET_BIT(g_snek_game.CR1, SNEK_CR1_GAME_TICK);
+	SNEK_SET_BIT(snek_game->CR1, SNEK_CR1_GAME_TICK);
 }

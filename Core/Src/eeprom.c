@@ -9,7 +9,7 @@
 #include "delay.h"
 #include "eeprom.h"
 
-static i2c_handle_t *p_eeprom_i2c;
+i2c_handle_t *p_eeprom_i2c;
 
 void Eeprom_SendData(uint8_t first_page, uint8_t *data_buffer, uint32_t data_size)
 {
