@@ -22,14 +22,14 @@
 #include "eeprom.h"
 
 void SysClockInit(void);
-void GPIOConfig(void);
-void TIM9Config(TimerHandle_t *p_handle_tim);
-void i2c1_config(i2c_handle_t *p_handle_i2c1);
+void GPIO_Config(void);
+void TIM9_Config(TimerHandle_t *p_handle_tim);
+void I2C1_Config(I2c_Handle_t *p_handle_i2c1);
 snek_game_t snek_game;
 
 int main()
 {
-	i2c_handle_t h_i2c1;
+	I2c_Handle_t h_i2c1;
 	TimerHandle_t h_tim9;
 
 	// Configure RCC
@@ -38,10 +38,10 @@ int main()
 	RCC_GetClockFrequencies(&freqs);
 
 	// Configure peripherals
-	GPIOConfig();
-	TIM9Config(&h_tim9);
+	GPIO_Config();
+	TIM9_Config(&h_tim9);
 	TIM_StartTimer(&h_tim9);
-	i2c1_config(&h_i2c1);
+	I2C1_Config(&h_i2c1);
 
 	// Configure devices
 	SSD1306_Init(&h_i2c1);
@@ -141,7 +141,7 @@ void SysClockInit(void)
 }
 
 //configure GPIO used in the project
-void GPIOConfig(void)
+void GPIO_Config(void)
 {
 	GPIO_Handle_t GPIOx;
 	GPIOx.PinConfig.PinNumber = GPIO_PIN_5;
@@ -174,16 +174,16 @@ void GPIOConfig(void)
 	
 }
 
-void i2c1_config(i2c_handle_t *p_handle_i2c1)
+void I2C1_Config(I2c_Handle_t *p_handle_i2c1)
 {
 	p_handle_i2c1->p_i2cx = I2C1;
 	p_handle_i2c1->i2c_config.abp1_freq_mhz = 42;
 	p_handle_i2c1->i2c_config.speed = I2C_SPEED_FAST_DUTY0;
 
-	i2c_init(p_handle_i2c1);
+	I2c_Init(p_handle_i2c1);
 }
 
-void TIM9Config(TimerHandle_t *p_handle_tim)
+void TIM9_Config(TimerHandle_t *p_handle_tim)
 {
 
 	p_handle_tim->p_timx = TIM9;

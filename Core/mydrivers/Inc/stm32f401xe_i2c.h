@@ -11,21 +11,21 @@
 #include "stm32f401xe.h"
 
 // Struct to configure I2C peripheral
-typedef struct i2c_config_t
+typedef struct I2c_Config_t
 {
 	uint8_t abp1_freq_mhz;			// @Frequency of ABP1 [MHz]
 
 	uint8_t speed;					// @Speed
 
-} i2c_config_t;
+} I2c_Config_t;
 
-typedef struct i2c_handle_t
+typedef struct I2c_Handle_t
 {
 	I2C_TypeDef *p_i2cx;		// @GPIOaddress
 
-	i2c_config_t i2c_config;	// @Peripheral config
+	I2c_Config_t i2c_config;	// @Peripheral config
 
-} i2c_handle_t;
+} I2c_Handle_t;
 
 
 /*
@@ -92,7 +92,7 @@ typedef struct i2c_handle_t
  */
 #define I2C_ERROR_WRONG_FREQUENCY 1U
 
-uint8_t i2c_init(i2c_handle_t *p_handle_i2c);
-uint8_t i2c_transmit(i2c_handle_t *p_hi2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_data_buffer,uint32_t data_size);
-uint8_t i2c_recieve(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size);
+uint8_t I2c_Init(I2c_Handle_t *p_handle_i2c);
+uint8_t I2c_Transmit(I2c_Handle_t *p_hi2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_data_buffer,uint32_t data_size);
+uint8_t I2c_Recieve(I2c_Handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size);
 #endif /* MYDRIVERS_INC_STM32F401XE_I2C_H_ */

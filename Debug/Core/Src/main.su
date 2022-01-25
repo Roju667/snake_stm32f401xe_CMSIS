@@ -5,6 +5,6 @@ main.c:75:6:EXTI2_IRQHandler	16	static
 main.c:89:6:EXTI15_10_IRQHandler	16	static
 main.c:114:6:TIM1_BRK_TIM9_IRQHandler	8	static
 main.c:121:6:SysClockInit	24	static
-main.c:144:6:GPIOConfig	24	static
-main.c:177:6:i2c1_config	16	static
-main.c:186:6:TIM9Config	16	static
+main.c:144:6:GPIO_Config	24	static
+main.c:177:6:I2C1_Config	16	static
+main.c:186:6:TIM9_Config	16	static
