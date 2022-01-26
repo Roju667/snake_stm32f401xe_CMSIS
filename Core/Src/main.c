@@ -57,22 +57,8 @@ int main()
 	}
 }
 
-// handler for button RIGHT
-void EXTI1_IRQHandler(void)
-{
-	uint8_t temp_gpio_pin;
-
-	if (EXTI->PR & (0b1 << SNEK_BUTTON_RIGHT))
-	{
-		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_RIGHT);
-		temp_gpio_pin = SNEK_BUTTON_RIGHT;
-	}
-
-	snek_button_callback(temp_gpio_pin, &snek_game);
-}
-
 // handler for button DOWN
-void EXTI2_IRQHandler(void)
+void EXTI9_5_IRQHandler(void)
 {
 	uint8_t temp_gpio_pin;
 
@@ -81,16 +67,12 @@ void EXTI2_IRQHandler(void)
 		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_DOWN);
 		temp_gpio_pin = SNEK_BUTTON_DOWN;
 	}
-
-	snek_button_callback(temp_gpio_pin, &snek_game);
-}
-
-// handler for buttons up/left/enter
-void EXTI15_10_IRQHandler(void)
-{
-	uint8_t temp_gpio_pin;
-	// if button is clicked
-	if (EXTI->PR & (0b1 << SNEK_BUTTON_UP))
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_ENTER))
+	{
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_ENTER);
+		temp_gpio_pin = SNEK_BUTTON_ENTER;
+	}
+	else if (EXTI->PR & (0b1 << SNEK_BUTTON_UP))
 	{
 		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_UP);
 		temp_gpio_pin = SNEK_BUTTON_UP;
@@ -101,10 +83,18 @@ void EXTI15_10_IRQHandler(void)
 		temp_gpio_pin = SNEK_BUTTON_LEFT;
 	}
 
-	else if (EXTI->PR & (0b1 << SNEK_BUTTON_ENTER))
+	snek_button_callback(temp_gpio_pin, &snek_game);
+}
+
+// handler for buttons up/left/enter
+void EXTI15_10_IRQHandler(void)
+{
+	uint8_t temp_gpio_pin;
+	// if button is clicked
+	if (EXTI->PR & (0b1 << SNEK_BUTTON_RIGHT))
 	{
-		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_ENTER);
-		temp_gpio_pin = SNEK_BUTTON_ENTER;
+		GPIO_ClearPendingEXTIFlag(SNEK_BUTTON_RIGHT);
+		temp_gpio_pin = SNEK_BUTTON_RIGHT;
 	}
 
 	snek_button_callback(temp_gpio_pin, &snek_game);

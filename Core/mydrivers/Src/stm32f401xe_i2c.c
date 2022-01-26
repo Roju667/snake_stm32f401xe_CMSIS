@@ -151,7 +151,7 @@ uint8_t i2c_init(i2c_handle_t *p_handle_i2c)
 	i2c_clock_enable(p_handle_i2c->p_i2cx);
 
 	// init GPIO pins
-	i2c_init_gpio_pins(p_handle_i2c->p_i2cx, 0);
+	i2c_init_gpio_pins(p_handle_i2c->p_i2cx, 1);
 
 	//reset I2C
 	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_SWRST;
