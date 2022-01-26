@@ -41,6 +41,10 @@ static void GPIO_ClockEnable(GPIO_TypeDef *GPIO)
 		RCC_CLOCK_GPIOH_ENABLE();
 	}
 
+	//this operation is unnecessary here because configuration library is taking more than 2 clock cycles
+	//between clock enable and configuring register, i leave it here to remind myself that stmf401x has
+	//a limitation that is described in errata point 2.1.6
+	__DSB();
 }
 /*
  * Initialize GPIO pin

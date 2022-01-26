@@ -40,6 +40,12 @@ void TIM_ClockEnable(TIM_TypeDef *p_timx)
 	{
 		RCC_CLOCK_TIM11_ENABLE();
 	}
+
+	//this operation is unnecessary here because configuration library is taking more than 2 clock cycles
+	//between clock enable and configuring register, i leave it here to remind myself that stmf401x has
+	//a limitation that is described in errata point 2.1.6
+	__DSB();
+
 }
 
 void TIM_InitTimer(TimerHandle_t *p_handle_timer)
