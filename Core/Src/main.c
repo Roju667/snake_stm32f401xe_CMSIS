@@ -6,11 +6,12 @@
  */
 
 
+#include <stm32f401xe_tim.h>
 #include "stm32f4xx.h"
 #include "stm32f401xe_gpio.h"
 #include "stm32f401xe_i2c.h"
 #include "stm32f401xe_rcc.h"
-#include "stm32401xe_tim.h"
+#include "stm32f401xe_pwr.h"
 #include "stm32f401xe.h"
 #include "SSD1306_OLED.h"
 #include "GFX_BW.h"
@@ -36,6 +37,9 @@ int main()
 	SysClockInit();
 	RCC_ClockFreqs freqs = {0};
 	RCC_GetClockFrequencies(&freqs);
+
+	RCC_CLOCK_PWR_ENABLE();
+	Pwr_EnablePvd(kPvdLevel22V, kPvdModeIrqRT);
 
 	// Configure peripherals
 	GPIO_Config();

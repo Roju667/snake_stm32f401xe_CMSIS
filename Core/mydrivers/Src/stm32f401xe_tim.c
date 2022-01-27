@@ -4,8 +4,8 @@
  *  Created on: Jan 21, 2022
  *      Author: ROJEK
  */
+#include <stm32f401xe_tim.h>
 #include "stm32f401xe_rcc.h"
-#include "stm32401xe_tim.h"
 
 
 void TIM_ClockEnable(TIM_TypeDef *p_timx)

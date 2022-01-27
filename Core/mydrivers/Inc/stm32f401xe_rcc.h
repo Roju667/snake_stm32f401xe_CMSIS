@@ -165,8 +165,8 @@ typedef struct RCC_ClockFreqs
  @VOSScale
  These bits control the main internal voltage regulator output voltage to achieve a trade-off
  between performance and power consumption. This should be assigned to PWR_register
- Scale 2 when 60MHz < HCLK < 84Mhz
- Scale 3 when HCLK < 60Mhz
+ Scale 2 when 60MHz < HCLK < 84Mhz -> regulator voltage ~1.26V
+ Scale 3 when HCLK < 60Mhz -> regulator voltage ~1.14V
  */
 #define RCC_VOS_SCALE3		1U
 #define RCC_VOS_SCALE2		2U
@@ -213,6 +213,8 @@ typedef struct RCC_ClockFreqs
 #define RCC_CLOCK_I2C2_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_I2C2EN
 #define RCC_CLOCK_I2C3_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_I2C3EN
 
+#define RCC_CLOCK_PWR_ENABLE()		RCC->APB1ENR |= RCC_APB1ENR_PWREN
+
 /*
  Clock disable macros
  */
@@ -236,6 +238,8 @@ typedef struct RCC_ClockFreqs
 #define RCC_CLOCK_I2C1_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN)
 #define RCC_CLOCK_I2C2_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C2EN)
 #define RCC_CLOCK_I2C3_DISABLE()	RCC->APB1ENR &= ~(RCC_APB1ENR_I2C3EN)
+
+#define RCC_CLOCK_PWR_DISABLE()		RCC->APB1ENR &= ~(RCC_APB1ENR_PWREN)
 
 
 uint8_t RCC_InitClock(RCC_ClockInitTypeDef *pClockInit);
