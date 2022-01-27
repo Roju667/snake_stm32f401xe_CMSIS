@@ -5,7 +5,7 @@
  *      Author: pawel
  */
 
-#include "stm32f401xe_gpio.h""
+#include "stm32f401xe_gpio.h"
 #include "stm32f401xe_i2c.h"
 #include "stm32f401xe_rcc.h"
 
@@ -15,7 +15,7 @@
  * @param[*p_i2cx] - base address of i2c peripheral
  * @return - void
  */
-static void i2c_clock_enable(I2C_TypeDef *p_i2cx)
+static void I2c_ClockEnable(I2C_TypeDef *p_i2cx)
 {
 	if (p_i2cx == I2C1)
 	{
@@ -38,7 +38,7 @@ static void i2c_clock_enable(I2C_TypeDef *p_i2cx)
  * @param[alternate_pos] - pins alternative positions select
  * @return - void
  */
-static void i2c_init_gpio_pins(I2C_TypeDef *p_i2cx, uint8_t alternate_pos)
+static void I2c_InitGpioPins(I2C_TypeDef *p_i2cx, uint8_t alternate_pos)
 {
 	GPIO_Handle_t gpio_sda, gpio_scl;
 
@@ -145,13 +145,13 @@ static void i2c_init_gpio_pins(I2C_TypeDef *p_i2cx, uint8_t alternate_pos)
  * @param[*p_handle_i2c] - handler to i2c structure
  * @return - void
  */
-uint8_t i2c_init(i2c_handle_t *p_handle_i2c)
+uint8_t I2c_Init(I2c_Handle_t *p_handle_i2c)
 {
 	// enable peripheral clock
-	i2c_clock_enable(p_handle_i2c->p_i2cx);
+	I2c_ClockEnable(p_handle_i2c->p_i2cx);
 
 	// init GPIO pins
-	i2c_init_gpio_pins(p_handle_i2c->p_i2cx, 1);
+	I2c_InitGpioPins(p_handle_i2c->p_i2cx, 1);
 
 	//reset I2C
 	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_SWRST;
@@ -218,7 +218,7 @@ uint8_t i2c_init(i2c_handle_t *p_handle_i2c)
  * @param[mode] - send information if master is in reciever or transmitter mode @Mode
  * @return - void
  */
-static void i2c_send_address(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mode, uint32_t timeout)
+static void I2c_SendAddress(I2c_Handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mode, uint32_t timeout)
 {
 	uint8_t temp_byte;
 	uint32_t temp_timeout = 0;
@@ -252,14 +252,14 @@ static void i2c_send_address(i2c_handle_t *p_handle_i2c, uint8_t slave_address, 
  * @param[data_size] - amount of data to be send [in bytes]
  * @return - uint8_t - to return error
  */
-uint8_t i2c_transmit(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_tx_data_buffer, uint32_t data_size)
+uint8_t I2c_Transmit(I2c_Handle_t *p_handle_i2c, uint8_t slave_address, uint8_t mem_address, uint8_t *p_tx_data_buffer, uint32_t data_size)
 {
 
 	uint32_t tx_data_to_send = data_size;
 	uint32_t tx_data_index = 0;
 	uint8_t temp_byte;
 
-	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_TRANSMITTER, 400000);
+	I2c_SendAddress(p_handle_i2c, slave_address, I2C_MODE_TRANSMITTER, 400000);
 
 	// wait until ADDR is set
 	while (!(I2C_SR1_ADDR & p_handle_i2c->p_i2cx->SR1))
@@ -304,13 +304,13 @@ uint8_t i2c_transmit(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t 
 	return 0;
 }
 
-uint8_t i2c_recieve(i2c_handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size)
+uint8_t I2c_Recieve(I2c_Handle_t *p_handle_i2c, uint8_t slave_address, uint8_t *p_rx_data_buffer, uint32_t data_size)
 {
 
 	uint32_t rx_data_to_get = data_size;
 	uint8_t temp_byte;
 	p_handle_i2c->p_i2cx->CR1 |= I2C_CR1_ACK;
-	i2c_send_address(p_handle_i2c, slave_address, I2C_MODE_RECIEVER, 400000);
+	I2c_SendAddress(p_handle_i2c, slave_address, I2C_MODE_RECIEVER, 400000);
 
 	while (!(I2C_SR1_ADDR & p_handle_i2c->p_i2cx->SR1))
 		;

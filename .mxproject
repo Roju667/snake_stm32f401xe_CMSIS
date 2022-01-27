@@ -1,18 +1,18 @@
 [PreviousGenFiles]
 AdvancedFolderStructure=true
 HeaderFileListSize=3
-HeaderFiles#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Inc/stm32f4xx_it.h
-HeaderFiles#1=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Inc/stm32f4xx_hal_conf.h
-HeaderFiles#2=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Inc/main.h
+HeaderFiles#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Inc/stm32f4xx_it.h
+HeaderFiles#1=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Inc/stm32f4xx_hal_conf.h
+HeaderFiles#2=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Inc/main.h
 HeaderFolderListSize=1
-HeaderPath#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Inc
+HeaderPath#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Inc
 HeaderFiles=;
 SourceFileListSize=3
-SourceFiles#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Src/stm32f4xx_it.c
-SourceFiles#1=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Src/stm32f4xx_hal_msp.c
-SourceFiles#2=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Src/main.c
+SourceFiles#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Src/stm32f4xx_it.c
+SourceFiles#1=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Src/stm32f4xx_hal_msp.c
+SourceFiles#2=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Src/main.c
 SourceFolderListSize=1
-SourcePath#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/nucleo_i2c_CMSIS/Core/Src
+SourcePath#0=C:/Users/ROJEK/STM32CubeIDE/workspace_1.6.1/snake_stm32f401fxe_CMSIS/Core/Src
 SourceFiles=;
 
 [PreviousLibFiles]
