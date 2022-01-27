@@ -30,4 +30,4 @@ Snek UI that i created :
 - Game screen - just snek game with updateing score on the top (snek can pass walls)  
 - Game over screen - displaying score with option to write your name (8 chars in big ASCII letters) - that is saved to eeprom if its high enough  
 
-![alt text]https://github.com/Roju667/snake_stm32f401xe_CMSIS/blob/main/Schematic_snake_2022-01-27.png
+![alt text](https://github.com/Roju667/snake_stm32f401xe_CMSIS/blob/main/Schematic_snake_2022-01-27.png)
