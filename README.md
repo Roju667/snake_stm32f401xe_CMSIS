@@ -29,3 +29,5 @@ Snek UI that i created :
 - High scores - displaying 4 scores that are saved in eeprom memory with option to scroll down between 1st and 10th place  
 - Game screen - just snek game with updateing score on the top (snek can pass walls)  
 - Game over screen - displaying score with option to write your name (8 chars in big ASCII letters) - that is saved to eeprom if its high enough  
+
+![alt text]
