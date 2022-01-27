@@ -10,8 +10,10 @@ What hardware i used :
 - SSD1306 OLED  
 - 5 push buttons  
 - 5x 10k pull up resistors  
-- 5x 1k resitor + 5x 100nF capacitor as RC filter  
-
+- 5x 1k resitor + 5x 100nF capacitor as RC filter 
+  
+![alt text](https://github.com/Roju667/snake_stm32f401xe_CMSIS/blob/main/Schematic_snake_2022-01-27.png)
+  
 What libraries i used :  
 - stm32f401xe.h - CMSIS lib
 - SSD1306_OLED + GFX_BW + fonts - that i took from https://msalamon.pl/ HAL programming course  
@@ -30,4 +32,4 @@ Snek UI that i created :
 - Game screen - just snek game with updateing score on the top (snek can pass walls)  
 - Game over screen - displaying score with option to write your name (8 chars in big ASCII letters) - that is saved to eeprom if its high enough  
 
-![alt text](https://github.com/Roju667/snake_stm32f401xe_CMSIS/blob/main/Schematic_snake_2022-01-27.png)
+
