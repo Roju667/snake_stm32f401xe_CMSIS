@@ -103,8 +103,9 @@ void EXTI15_10_IRQHandler(void)
 // game tick
 void TIM1_BRK_TIM9_IRQHandler(void)
 {
-	snek_gametick_callback(&snek_game);
 	TIM_ClearUpdateFlag(TIM9);
+	snek_gametick_callback(&snek_game);
+
 }
 
 // system clock init function
